@@ -1,0 +1,101 @@
+name:                crypto-venues
+version:             0.1.0.0
+github:              "runeksvendsen/crypto-venues"
+license:             BSD3
+author:              "Rune K. Svendsen"
+maintainer:          "example@example.com"
+copyright:           "2017 Author name here"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on Github at <https://github.com/githubuser/crypto-venues#readme>
+
+default-extensions:
+- StrictData
+- BangPatterns
+- NoImplicitPrelude
+- ScopedTypeVariables
+- MultiParamTypeClasses
+- ScopedTypeVariables
+- OverloadedStrings
+- KindSignatures
+- DataKinds
+- FlexibleInstances
+- DeriveGeneric
+- RecordWildCards
+- DuplicateRecordFields
+- FlexibleContexts
+- DeriveFunctor
+- TypeOperators
+
+dependencies:
+- base            >= 4.7    && < 5
+- protolude
+- safe-money      >= 0.4.1  && < 0.5
+- orderbook
+- servant         >= 0.11   && < 0.12
+- servant-client  >= 0.11   && < 0.12
+- servant-server
+- servant-docs
+- aeson
+- vector
+- bytestring
+- scientific
+- json-schema
+- pretty-show
+- text
+- safe
+- http-client
+- http-client-tls
+- typelits-witnesses
+- errors
+# Venues
+- template-haskell
+- http-types
+- mtl
+- unordered-containers
+
+library:
+  source-dirs: src
+
+executables:
+  crypto-venues-exe:
+    main:                Main.hs
+    source-dirs:
+    - app
+    - src
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - crypto-venues
+
+tests:
+  crypto-venues-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - crypto-venues
+    - QuickCheck
+    - hspec
+    - HUnit
+    - tasty
+    - tasty-smallcheck
+    - tasty-quickcheck
+    - smallcheck
+    - hspec-smallcheck
+    - hspec-expectations-pretty-diff
