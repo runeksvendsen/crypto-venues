@@ -16,11 +16,12 @@ data Market (venue :: Symbol) = Market
    , miApiSymbol  :: Text
    } deriving (Eq, Generic)
 
-newtype MarketList venue = MarketList [Market venue]
-
+newtype MarketList (venue :: Symbol) = MarketList { getMarkets :: [Market venue] }
+   deriving (Eq, Show)
 
 instance KnownSymbol venue => Show (Market venue) where
    show Market{..} = printf template venueName miBase miQuote
       where
          template = "<%s %s/%s>"
          venueName = symbolVal (Proxy :: Proxy venue)
+

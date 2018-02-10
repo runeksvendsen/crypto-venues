@@ -1,6 +1,7 @@
 import CPrelude
 
-import qualified Spec.MarketString  as MarketStr
+import qualified Spec.MarketString
+import qualified Spec.VenueFetch
 import Markets                      (fromString, toString)
 
 import Test.Tasty
@@ -9,12 +10,18 @@ import Test.Hspec             as HS
 import Test.Hspec.Runner
 import qualified Test.SmallCheck.Series as SS
 import Orphans.Market
+import qualified Network.HTTP.Client.TLS as HTTPS
+
 
 scDepth = 4
 
 main = do
-   defaultMain properties
---   hspecWith defaultConfig { configSmallCheckDepth = scDepth } MarketStr.spec
+   man <- HTTPS.newTlsManager
+   let runHspec = hspecWith defaultConfig { configSmallCheckDepth = scDepth }
+   runHspec $ parallel $ do
+      Spec.VenueFetch.spec man
+      Spec.MarketString.spec
+   --   defaultMain properties
 
 
 properties :: TestTree

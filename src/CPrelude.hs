@@ -4,6 +4,7 @@ module CPrelude
 , module Safe
 , module TypeLits
 , module Prelude
+, module EitherT
 , sameSym
 --, Show
 --, show
@@ -26,6 +27,7 @@ import Safe
 import GHC.TypeLits as TypeLits (Symbol, KnownSymbol, SomeSymbol(..)
                                 , sameSymbol, symbolVal, someSymbolVal
                                 )
+import Control.Monad.Trans.Either as EitherT
 --import Prelude (String)
 --import Orphans ()
 --import Data.Text

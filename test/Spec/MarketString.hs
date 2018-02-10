@@ -3,7 +3,6 @@ module Spec.MarketString where
 import CPrelude
 import Markets          (fromString, toString)
 import Fetch.MarketBook
---import Venue.Types
 import Orphans.Market
 
 import Test.Hspec
@@ -17,7 +16,7 @@ import qualified Test.SmallCheck.Series as SS
 spec :: Spec
 spec =
    describe "AnyMarket" $ do
-      it "can be created from any String" $
+      it "can be created from any well-formatted String" $
          SC.property $ \(SS.NonEmpty base) (SS.NonEmpty quote) (HyphenStr apiSym) ->
             fromString testVenue (toS $ base ++ "-" ++ quote ++ "-" ++ apiSym)
                `shouldSatisfy` isJust

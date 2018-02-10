@@ -58,9 +58,9 @@ type Api base quote
    :> QueryParam "len" Word
    :> Get '[JSON] (OrderBook "bitfinex-v2" base quote)
 
-instance DataSource (OrderBook "bitfinex-v2" "BTC" "USD") where
-   dataSrc = DataSrc bitfinex (clientM "tBTCUSD" (Just 250))
-      where
-         clientM = SC.client (Proxy :: Proxy (Api "BTC" "USD"))
+--instance DataSource (OrderBook "bitfinex-v2" "BTC" "USD") where
+--   dataSrc = DataSrc bitfinex (clientM "tBTCUSD" (Just 250))
+--      where
+--         clientM = SC.client (Proxy :: Proxy (Api "BTC" "USD"))
 
 

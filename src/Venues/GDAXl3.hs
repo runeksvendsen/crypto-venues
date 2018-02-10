@@ -45,15 +45,15 @@ type Api base quote
    :> Header "User-Agent" Text
    :> Get '[JSON] (OrderBook "gdax-l3" base quote)
 
-instance DataSource (OrderBook "gdax-l3" "BTC" "USD") where
-   dataSrc = DataSrc gdax (clientM "BTC-USD" (Just 3) (Just userAgent))
-      where
-         clientM = SC.client (Proxy :: Proxy (Api "BTC" "USD"))
+--instance DataSource (OrderBook "gdax-l3" "BTC" "USD") where
+--   dataSrc = DataSrc gdax (clientM "BTC-USD" (Just 3) (Just userAgent))
+--      where
+--         clientM = SC.client (Proxy :: Proxy (Api "BTC" "USD"))
 
-instance DataSource (OrderBook "gdax-l3" "BTC" "EUR") where
-   dataSrc = DataSrc gdax (clientM "BTC-EUR" (Just 3) (Just userAgent))
-      where
-         clientM = SC.client (Proxy :: Proxy (Api "BTC" "EUR"))
+--instance DataSource (OrderBook "gdax-l3" "BTC" "EUR") where
+--   dataSrc = DataSrc gdax (clientM "BTC-EUR" (Just 3) (Just userAgent))
+--      where
+--         clientM = SC.client (Proxy :: Proxy (Api "BTC" "EUR"))
 
 -- TODO: Use custom user agent
 userAgent :: Text

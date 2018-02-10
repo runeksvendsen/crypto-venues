@@ -1,6 +1,11 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ExistentialQuantification #-}
-module Fetch.MarketBook where
+module Fetch.MarketBook
+( MarketBook(..)
+, AnyMarket(..)
+, fetchMarketBook
+)
+where
 
 import CPrelude
 import Fetch.DataSrc
@@ -29,13 +34,13 @@ instance Eq AnyMarket where
 instance Show AnyMarket where
    show (AnyMarket m) = show m
 
-fetchFromMarket
+fetchMarketBook
    :: forall venue.
       (KnownSymbol venue, MarketBook venue)
    => HTTP.Manager
    -> Market venue
    -> IO (Either SC.ServantError (AnyBook venue))
-fetchFromMarket man market@Market{..} =
+fetchMarketBook man market@Market{..} =
    fmap (bookFromMarket market) <$> srcFetch man (marketBook miApiSymbol)
 
 bookFromMarket

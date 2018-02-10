@@ -56,13 +56,13 @@ dependencies:
 - safe
 - http-client
 - http-client-tls
-- typelits-witnesses
+#- typelits-witnesses
 - errors
 # Venues
-- template-haskell
 - http-types
 - mtl
 - unordered-containers
+- either
 
 library:
   source-dirs: src

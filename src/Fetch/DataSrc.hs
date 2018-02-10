@@ -9,7 +9,7 @@ import qualified Data.Aeson            as Json
 import qualified Network.HTTP.Client   as HTTP
 
 
-class Json.FromJSON dataType => DataSource dataType where
+class DataSource dataType where
    dataSrc :: DataSrc dataType
 
 data DataSrc dataType = DataSrc
@@ -18,18 +18,19 @@ data DataSrc dataType = DataSrc
    }
 
 srcFetch
-   :: forall dataType.
-      HTTP.Manager
+   :: forall m dataType.
+      MonadIO m
+   => HTTP.Manager
    -> DataSrc dataType
-   -> IO (Either SC.ServantError dataType)
-srcFetch man ds = SC.runClientM clientM env
+   -> m (Either SC.ServantError dataType)
+srcFetch man ds = liftIO $ SC.runClientM clientM env
    where env = SC.ClientEnv man (dsUrl ds)
          clientM = dsClientM ds
 
-fetch :: forall dataType.
-         DataSource dataType
+fetch :: forall m dataType.
+         (MonadIO m, DataSource dataType)
       => HTTP.Manager
-      -> IO (Either SC.ServantError dataType)
+      -> m (Either SC.ServantError dataType)
 fetch man = srcFetch man (dataSrc :: DataSrc dataType)
 
 
