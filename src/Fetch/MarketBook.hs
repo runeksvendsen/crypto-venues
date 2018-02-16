@@ -16,6 +16,7 @@ import qualified Servant.Client        as SC
 import           Servant.API
 import qualified Data.Aeson            as Json
 import qualified Network.HTTP.Client   as HTTP
+import Data.Hashable
 
 
 -- | Use 'miApiSymbol' from 'Market' to fetch a 'SomeBook'
@@ -33,6 +34,9 @@ instance Eq AnyMarket where
 
 instance Show AnyMarket where
    show (AnyMarket m) = show m
+
+--instance Hashable AnyMarket where
+--   hashWithSalt
 
 fetchMarketBook
    :: forall venue.

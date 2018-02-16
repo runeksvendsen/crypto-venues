@@ -41,8 +41,8 @@ testFetchArbOrderbook man =
 
 withMarketList :: HTTP.Manager -> AnyVenue -> ([AnyMarket] -> IO ()) -> IO ()
 withMarketList man venue f = do
-   markets <- throwErr =<< marketList man venue
+   markets <- liftIO $ failOnErr =<< runExceptT (marketList man venue)
    f markets
 
-throwErr :: (Monad m, Show e) => Either e a -> m a
-throwErr = either (error . toS . show) return
+failOnErr :: (Monad m, Show e) => Either e a -> m a
+failOnErr = either (error . show) return

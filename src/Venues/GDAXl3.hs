@@ -14,6 +14,7 @@ import           Data.Vector  (Vector)
 --import Control.Monad.Fail
 import qualified Data.Aeson.Types   as Json
 
+
 instance Json.FromJSON (OrderBook "gdax-l3" base quote) where
    parseJSON val =
       let fromBook Book{..} = OrderBook

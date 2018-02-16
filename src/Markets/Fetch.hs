@@ -10,14 +10,14 @@ import Venue.Types
 import Fetch
 import qualified Network.HTTP.Client   as HTTP
 import qualified Servant.Common.Req    as Req
-import Data.Either
-
+--import Control.Monad.Trans.Except
 
 marketList
-   :: HTTP.Manager
+   :: MonadIO m
+   => HTTP.Manager
    -> AnyVenue
-   -> IO (Either Req.ServantError [AnyMarket])
+   -> ExceptT Req.ServantError m [AnyMarket] -- IO (Either Req.ServantError [AnyMarket])
 marketList man (AnyVenue p) = case p of
-   (Proxy :: Proxy venue) -> runEitherT $ do
-      res :: MarketList venue <- hoistEither =<< fetch man
+   (Proxy :: Proxy venue) -> do
+      res :: MarketList venue <- throwErr =<< fetch man
       return $ map AnyMarket (getMarkets res)

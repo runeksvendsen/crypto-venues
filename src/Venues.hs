@@ -40,3 +40,5 @@ venueMap :: HM.HashMap Text AnyVenue
 -- | Lookup by 'Text' string in the map of all venues
 venueLookup :: Text -> Maybe AnyVenue
 venueLookup = (`HM.lookup` venueMap)
+
+

@@ -1,11 +1,16 @@
-resolver: lts-9.20
+resolver: lts-10.5
 
 packages:
 - .
 - location:
     git: https://github.com/runeksvendsen/orderbook.git
-    commit: 0b4d38ee806469e28b1f724e96a7c76fb71be39a
+    commit: 1bdfd4b2a7b54246a116206f959f11749d82ad09
   extra-dep: true
+- location:
+    git: https://github.com/patrickdoc/hash-graph.git
+    commit: f18b143bfbbb936806c8d33bdcbc4d8970f11391
+  extra-dep: true
+
 #- ../orderbook
 
 # Dependency packages to be pulled from upstream that are not in the resolver

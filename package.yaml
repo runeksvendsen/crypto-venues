@@ -8,7 +8,6 @@ copyright:           "2017 Author name here"
 
 extra-source-files:
 - README.md
-- ChangeLog.md
 
 # Metadata used when publishing your package
 synopsis:            Short description of your package
@@ -17,7 +16,7 @@ synopsis:            Short description of your package
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on Github at <https://github.com/githubuser/crypto-venues#readme>
+description:         Please see the README on Github at <https://github.com/runeksvendsen/crypto-venues#readme>
 
 default-extensions:
 - StrictData
@@ -42,6 +41,7 @@ dependencies:
 - protolude
 - safe-money      >= 0.4.1  && < 0.5
 - orderbook
+- hash-graph
 - servant         >= 0.11   && < 0.12
 - servant-client  >= 0.11   && < 0.12
 - servant-server
@@ -62,7 +62,9 @@ dependencies:
 - http-types
 - mtl
 - unordered-containers
-- either
+- transformers
+- monad-parallel
+- hashable
 
 library:
   source-dirs: src
