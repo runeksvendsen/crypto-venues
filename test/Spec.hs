@@ -1,7 +1,6 @@
 import CPrelude
 
 import qualified Spec.VenueFetch
-import Markets                      (fromString, toString)
 
 import Test.Tasty
 import Test.Tasty.SmallCheck  as SC

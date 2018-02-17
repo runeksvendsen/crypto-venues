@@ -66,8 +66,8 @@ type ApiDepth
    :> Get '[JSON] (SomeBook "binance")
 
 data Book = Book
-   { bids   :: Vector (Text,Text)
-   , asks   :: Vector (Text,Text)
+   { bids   :: Vector (Text,Text,[Text])
+   , asks   :: Vector (Text,Text,[Text])
    } deriving Generic
 
 instance Json.FromJSON Book
@@ -86,6 +86,6 @@ instance Json.FromJSON (SomeBook "binance") where
       in Json.parseJSON val >>= fromBook >>= either fail return
 
 
-parseOrder :: (Text,Text) -> Json.Parser SomeOrder
-parseOrder (price,amount) = parseSomeOrderStr (toS price) (toS amount)
+parseOrder :: (Text,Text,[Text]) -> Json.Parser SomeOrder
+parseOrder (price,amount,_) = parseSomeOrderStr (toS price) (toS amount)
 
