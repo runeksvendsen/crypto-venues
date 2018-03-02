@@ -6,6 +6,7 @@ module Venues
 where
 
 import CPrelude
+import Fetch.MarketBook
 
 import Venues.GDAXl2       as GDAXl2         ()
 import Venues.GDAXl3       as GDAXl3         ()
@@ -15,7 +16,6 @@ import Venues.BitfinexV2   as BitfinexV2     ()
 import Venues.Bittrex      as Bittrex        ()
 import Venues.Binance      as Binance        ()
 
-import Venue.Types
 import qualified Network.HTTP.Client   as HTTP
 import qualified Servant.Common.Req    as Req
 import qualified Servant.Client        as SC
@@ -29,8 +29,6 @@ allVenues =
    , AnyVenue (Proxy :: Proxy "bittrex")
    , AnyVenue (Proxy :: Proxy "binance")
    , AnyVenue (Proxy :: Proxy "bitstamp")
---   , AnyVenue (Proxy :: Proxy "gdax-l2")
---   , AnyVenue (Proxy :: Proxy "gdax-l3")
    ]
 
 -- | Map of all supported venue names to its corresponding 'AnyVenue'

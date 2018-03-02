@@ -4,7 +4,7 @@ packages:
 - .
 - location:
     git: https://github.com/runeksvendsen/orderbook.git
-    commit: 1bdfd4b2a7b54246a116206f959f11749d82ad09
+    commit: 1e89783eb0bcdf7d138c9b13af98931ecb14be76
   extra-dep: true
 - location:
     git: https://github.com/patrickdoc/hash-graph.git
@@ -22,9 +22,13 @@ extra-deps:
 - xmlbf-0.2
 - cborg-0.2.0.0
 ### END safe-money deps
-## BEGIN test deps
+- rate-limit-1.4.0
+### BEGIN rate-limit deps
+- time-units-1.0.0
+### END rate-limit deps
+### BEGIN test deps
 - hspec-smallcheck-0.5.0  # make "shouldBe" work with "SS.property"
-## END test deps
+### END test deps
 
 #flags:
 #  safe-money:

@@ -1,17 +1,20 @@
-module Spec.VenueFetch where
+module Spec.VenueFetch
+( spec )
+where
 
 import CPrelude
 import qualified Venues
+import qualified Spec.RateLimit as RateLimit
 import Fetch
-import Venue.Types
-import Markets.Types
-import Markets.Fetch
+
+import Types.Market
+import Fetch
 import Test.Hspec
 import qualified Network.HTTP.Client   as HTTP
 import qualified Test.QuickCheck    as QC
 
 
--- | The minimum number of markets we require a venue to have
+-- | A sane lower bound on how many markets a venue must have
 minNumMarkets :: Int
 minNumMarkets = 5
 
@@ -20,28 +23,35 @@ spec man =
    forM_ Venues.allVenues (testVenue man)
 
 testVenue :: HTTP.Manager -> AnyVenue -> Spec
-testVenue man venue =
+testVenue man av@(AnyVenue venue) = parallel $
    around (withMarketList man venue) $
-      parallel $
-         describe ("for " ++ show venue) $ do
-            testMarketListLength man
-            testFetchArbOrderbook man
+      describe ("for " ++ show av) $ do
+         testMarketListLength man
+         testFetchArbOrderbook man
+         RateLimit.testRateLimitFetch man
 
-testMarketListLength :: HTTP.Manager -> SpecWith (Arg ([AnyMarket] -> IO ()))
+testMarketListLength :: HTTP.Manager -> SpecWith (Arg ([Market venue] -> IO ()))
 testMarketListLength man =
    it ("we can fetch at least " ++ show minNumMarkets ++ " markets") $ \markets ->
       length markets `shouldSatisfy` (>= minNumMarkets)
 
-testFetchArbOrderbook :: HTTP.Manager -> SpecWith (Arg ([AnyMarket] -> IO ()))
+testFetchArbOrderbook
+   :: MarketBook venue
+   => HTTP.Manager
+   -> SpecWith (Arg ([Market venue] -> IO ()))
 testFetchArbOrderbook man =
-   it "we can fetch a randomly chosen market orderbook" $ \markets -> do
-      AnyMarket market <- QC.generate (QC.elements markets)
-      bookE <- fetchMarketBook man market
+   it "we can fetch a randomly chosen market order book" $ \markets -> do
+      market <- QC.generate (QC.elements markets)
+      bookE <- runAppM man $ fetchMarketBook market
       bookE `shouldSatisfy` isRight
 
-withMarketList :: HTTP.Manager -> AnyVenue -> ([AnyMarket] -> IO ()) -> IO ()
+withMarketList
+   :: forall venue. EnumMarkets venue
+   => HTTP.Manager
+   -> Proxy venue
+   -> ([Market venue] -> IO ()) -> IO ()
 withMarketList man venue f = do
-   markets <- liftIO $ failOnErr =<< runExceptT (marketList man venue)
+   markets <- failOnErr =<< runAppM man (marketList venue)
    f markets
 
 failOnErr :: (Monad m, Show e) => Either e a -> m a

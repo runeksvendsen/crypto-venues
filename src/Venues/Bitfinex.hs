@@ -5,9 +5,10 @@ where
 
 import CPrelude     hiding (asks)
 import OrderBook
-import Markets
 import Fetch
+import Types.Market
 import Venues.Common.StringArrayOrder  (parseSomeOrderStr)
+
 import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client        as SC
 import Servant.API
@@ -19,9 +20,8 @@ import Control.Monad.Fail
 import qualified Data.Text as T
 
 
-
-instance DataSource (MarketList "bitfinex") where
-   dataSrc = DataSrc apiUrl clientM
+instance EnumMarkets "bitfinex" where
+   allMarkets = DataSrc apiUrl clientM
       where
          clientM = SC.client (Proxy :: Proxy ApiMarkets)
 
@@ -29,6 +29,8 @@ instance MarketBook "bitfinex" where
    marketBook apiSymbol = DataSrc apiUrl cm
       where cm = clientM apiSymbol (Just 1000) (Just 1000)
             clientM = SC.client (Proxy :: Proxy (Api base quote))
+   rateLimit = DataSrc apiUrl (return . fromRational . toRational $ 1)
+-- Orderbook rate limit: Ratelimit: 60 req/min (https://docs.bitfinex.com/v1/reference#rest-public-orderbook)
 
 instance Json.FromJSON (SomeBook "bitfinex") where
    parseJSON val =
@@ -70,8 +72,6 @@ type ApiMarkets
    = "v1"
    :> "symbols"
    :> Get '[JSON] (MarketList "bitfinex")
-
---newtype TxtLst = TxtLst [Text] deriving Json.FromJSON
 
 instance Json.FromJSON (MarketList "bitfinex") where
    parseJSON val = MarketList <$> Json.parseJSON val

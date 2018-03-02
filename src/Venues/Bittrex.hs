@@ -8,9 +8,9 @@ where
 import CPrelude
 import Prelude (getChar)
 import OrderBook
-import Markets
 import Fetch
-import Venues.Common.StringArrayOrder  (convSci)
+import Types.Market
+
 import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client        as SC
 import qualified Data.Scientific as Sci
@@ -62,7 +62,7 @@ parseOrder bo@BittrexOrder{..} =
    where soM = mkSomeOrder (toRational quantity) (toRational rate)
 
 
-baseurl = S.BaseUrl S.Https "bittrex.com" 443 ""
+apiUrl = S.BaseUrl S.Https "bittrex.com" 443 ""
 
 -- | Example: https://bittrex.com/api/v1.1/public/getorderbook?market=BTC-ADA&type=both
 type Api base quote
@@ -74,11 +74,9 @@ type Api base quote
    :> QueryParam "type" Text
    :> Get '[JSON] (SomeBook "bittrex")
 
---instance DataSource (OrderBook "bittrex" "ADA" "BTC") where
---   dataSrc = mkBookSrc "ADA-BTC"
 
 mkBookSrc :: Text -> DataSrc (SomeBook "bittrex")
-mkBookSrc pair = DataSrc baseurl (clientM (Just pair) (Just "both"))
+mkBookSrc pair = DataSrc apiUrl (clientM (Just pair) (Just "both"))
    where
    clientM = SC.client (Proxy :: Proxy (Api base quote))
 
@@ -103,9 +101,11 @@ type ApiMarkets
 
 instance MarketBook "bittrex" where
    marketBook = mkBookSrc
+   rateLimit = DataSrc apiUrl (return . fromRational . toRational $ 1)
+   -- Rate limit: 1 per second (https://bitcoin.stackexchange.com/questions/59316/trading-bot-what-is-the-maximum-load-an-exchange-server-can-take)
 
-instance DataSource (MarketList "bittrex") where
-   dataSrc = DataSrc baseurl clientM
+instance EnumMarkets "bittrex" where
+   allMarkets = DataSrc apiUrl clientM
       where
          clientM = SC.client (Proxy :: Proxy ApiMarkets)
 

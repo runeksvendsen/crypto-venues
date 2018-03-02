@@ -5,7 +5,9 @@ where
 import CPrelude
 import OrderBook
 import Fetch
+import Types.Market
 import Venues.Common.StringArrayOrder  (parseOrderStr)
+
 import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client as SC
 import Servant.API

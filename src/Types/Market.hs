@@ -1,4 +1,4 @@
-module Markets.Types where
+module Types.Market where
 
 import CPrelude
 import Fetch.DataSrc
@@ -16,6 +16,9 @@ data Market (venue :: Symbol) = Market
    , miApiSymbol  :: Text
    } deriving (Eq, Generic)
 
+instance NFData (Market venue)
+
+-- | Only used in order to be able to create custom FromJSON instance
 newtype MarketList (venue :: Symbol) = MarketList { getMarkets :: [Market venue] }
    deriving (Eq, Show)
 

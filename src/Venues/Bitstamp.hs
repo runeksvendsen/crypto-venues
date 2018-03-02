@@ -4,9 +4,10 @@ where
 
 import CPrelude
 import OrderBook
-import Markets
 import Fetch
+import Types.Market
 import Venues.Common.StringArrayOrder  (parseSomeOrderStr)
+
 import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client        as SC
 import Servant.API
@@ -21,9 +22,11 @@ import Control.Monad.Fail
 instance MarketBook "bitstamp" where
    marketBook apiSymbol = DataSrc apiUrl (cm apiSymbol)
       where cm = SC.client (Proxy :: Proxy ApiOb)
+   rateLimit = DataSrc apiUrl (return . fromRational . toRational $ 1)
+   -- Rate limit: 600 requests per 10 minutes (https://www.bitstamp.net/api/)
 
-instance DataSource (MarketList "bitstamp") where
-   dataSrc = DataSrc apiUrl clientM
+instance EnumMarkets "bitstamp" where
+   allMarkets = DataSrc apiUrl clientM
       where
          clientM = SC.client (Proxy :: Proxy ApiMarkets)
 
