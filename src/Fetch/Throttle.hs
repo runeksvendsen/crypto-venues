@@ -40,15 +40,15 @@ fetchRateLimited marketLst = do
    limFetch <- mkRateLimited
    handleErr $ foldrM (go limFetch) (Right []) marketLst
    where
-      handleErr :: IO (Either FetchErr a) -> AppM IO a
+      handleErr :: IO (Either Error a) -> AppM IO a
       handleErr ioa = throwLeft =<< liftIO ioa
 
 -- | Fetch a single 'AnyBook' with rate-limiting enabled, and
 --  recover from failure as per 'retryPolicy'
-go :: (Market venue -> IO (Either FetchErr (AnyBook venue)))   -- ^ Rate-limited fetch function
-   -> Market venue                                             -- ^ Which order book to fetch?
-   -> Either FetchErr [AnyBook venue]                          -- ^ Result of previous fetch (error or list of order books)
-   -> IO (Either FetchErr [AnyBook venue])
+go :: (Market venue -> IO (Either Error (AnyBook venue)))   -- ^ Rate-limited fetch function
+   -> Market venue                                          -- ^ Which order book to fetch?
+   -> Either Error [AnyBook venue]                          -- ^ Result of previous fetch (error or list of order books)
+   -> IO (Either Error [AnyBook venue])
 go limFetch market (Right lst) =
    Re.retrying retryPolicy doRetry $ \_ -> do
       resE <- limFetch market
@@ -63,10 +63,12 @@ doRetry _ _ = return False
 mkRateLimited
    :: forall venue.
       MarketBook venue
-   => AppM IO (Market venue -> IO (Either FetchErr (AnyBook venue)))
+   => AppM IO (Market venue -> IO (Either Error (AnyBook venue)))
 mkRateLimited = do
    man <- ask
-   limit :: RateLimit venue <- throwLeft =<< srcFetch man dSrc
+   let venue = Proxy :: Proxy venue
+       handleErr = throwLeft . fmapL (Error (VenueEnumErr venue))
+   limit :: RateLimit venue <- handleErr =<< srcFetch man dSrc
    -- NB: Per-execution rate limit is important here,
    --  because otherwise new requests would be spawned
    --  while existing requests, that are paused while retrying,

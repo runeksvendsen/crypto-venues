@@ -1,8 +1,11 @@
+--{-# LANGUAGE ExistentialQuantification #-}
 module Types.Market where
 
-import CPrelude
-import Fetch.DataSrc
+import Prelude
+import Protolude
+--import Fetch.DataSrc
 import OrderBook.Types
+import Text.Printf
 import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client        as SC
 import           Servant.API
@@ -23,8 +26,10 @@ newtype MarketList (venue :: Symbol) = MarketList { getMarkets :: [Market venue]
    deriving (Eq, Show)
 
 instance KnownSymbol venue => Show (Market venue) where
-   show Market{..} = printf template venueName miBase miQuote
+   show mkt@Market{..} = printf template venueName (marketName mkt)
       where
-         template = "<%s %s/%s>"
+         template = "<%s %s>"
          venueName = symbolVal (Proxy :: Proxy venue)
 
+marketName :: Market venue -> String
+marketName Market{..} = printf "%s/%s" miBase miQuote

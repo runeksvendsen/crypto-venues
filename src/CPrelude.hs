@@ -12,6 +12,7 @@ module CPrelude
 , Vector
 , fmapL
 , printf
+, fail
 )
 where
 
@@ -26,7 +27,7 @@ import GHC.TypeLits as TypeLits (Symbol, KnownSymbol, SomeSymbol(..)
                                 )
 import Control.Monad.Trans.Except as EitherT
 import Control.Monad.Fail
-import Control.Monad.Except
+import Control.Monad.Except hiding (fail)
 import           Data.Vector  (Vector)
 import Text.Printf
 import Data.EitherR (fmapL)
@@ -34,6 +35,7 @@ import Control.Monad.Trans.Reader
 import qualified Network.HTTP.Client   as HTTP
 
 import qualified Control.Monad.Parallel   as Par
+
 
 sameSym :: (KnownSymbol a, KnownSymbol b) => Proxy a -> Proxy b -> Bool
 sameSym a b = isJust (sameSymbol a b)

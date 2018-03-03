@@ -35,7 +35,7 @@ instance Json.FromJSON Book
 type GDAXl2Order = (String,String,Word)   -- Price, Quantity, Order_Count
 
 parseOrder :: GDAXl2Order -> Json.Parser (Order base quote)
-parseOrder (price,qty,_) = parseOrderStr price qty
+parseOrder (price,qty,_) = either fail return $ parseOrderStr price qty
 
 gdax :: SC.BaseUrl
 gdax = S.BaseUrl S.Https "api.gdax.com" 443 ""

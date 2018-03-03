@@ -23,5 +23,6 @@ marketList
    -> AppM m [Market venue]
 marketList p = do
    man <- ask
-   res :: MarketList venue <- throwLeft =<< srcFetch man allMarkets
+   let handleErr = throwLeft . fmapL (Error (VenueEnumErr p))
+   res :: MarketList venue <- handleErr =<< srcFetch man allMarkets
    return $ getMarkets res

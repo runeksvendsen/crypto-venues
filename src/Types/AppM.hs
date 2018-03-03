@@ -13,11 +13,17 @@ import qualified Control.Monad.Parallel   as Par
 throwLeft :: MonadError e m => Either e a -> m a
 throwLeft = either throwError return
 
-newtype AppM m a = AppM { getAppM :: ReaderT HTTP.Manager (ExceptT FetchErr m) a }
-   deriving ( Applicative, Functor, Monad, MonadIO
-            , MonadError FetchErr, MonadReader HTTP.Manager
-            , Par.MonadParallel)
+newtype AppM m a = AppM { getAppM :: ReaderT HTTP.Manager (ExceptT Error m) a }
+   deriving
+   ( Applicative
+   , Functor
+   , Monad
+   , MonadIO
+   , MonadError Error
+   , MonadReader HTTP.Manager
+   , Par.MonadParallel
+   )
 
-runAppM :: HTTP.Manager -> AppM IO a -> IO (Either FetchErr a)
+runAppM :: HTTP.Manager -> AppM IO a -> IO (Either Error a)
 runAppM man appM = runExceptT $ runReaderT (getAppM appM) man
 

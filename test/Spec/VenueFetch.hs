@@ -23,12 +23,13 @@ spec man =
    forM_ Venues.allVenues (testVenue man)
 
 testVenue :: HTTP.Manager -> AnyVenue -> Spec
-testVenue man av@(AnyVenue venue) = parallel $
+testVenue man av@(AnyVenue venue) =
    around (withMarketList man venue) $
-      describe ("for " ++ show av) $ do
-         testMarketListLength man
-         testFetchArbOrderbook man
-         RateLimit.testRateLimitFetch man
+      describe ("for " ++ show av) $
+         parallel $ do
+            testMarketListLength man
+            -- testFetchArbOrderbook man
+            RateLimit.testRateLimitFetch man
 
 testMarketListLength :: HTTP.Manager -> SpecWith (Arg ([Market venue] -> IO ()))
 testMarketListLength man =

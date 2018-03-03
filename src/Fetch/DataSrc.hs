@@ -21,6 +21,6 @@ srcFetch
    -> DataSrc dataType
    -> m (Either FetchErr dataType)
 srcFetch man ds = liftIO cmRes
-   where cmRes = fmapL fromServant <$> SC.runClientM clientM env
+   where cmRes = fmapL fromServant <$> SC.runClientM (dsClientM ds) env
          env = SC.ClientEnv man (dsUrl ds)
-         clientM = dsClientM ds
+

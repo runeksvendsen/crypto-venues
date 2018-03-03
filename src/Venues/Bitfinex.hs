@@ -54,7 +54,7 @@ instance Json.FromJSON Book
 instance Json.FromJSON BitfinexOrder
 
 parseOrder :: BitfinexOrder -> Json.Parser SomeOrder
-parseOrder BitfinexOrder{..} = parseSomeOrderStr price amount
+parseOrder BitfinexOrder{..} = either fail return $ parseSomeOrderStr price amount
 
 apiUrl :: S.BaseUrl
 apiUrl = S.BaseUrl S.Https "api.bitfinex.com" 443 ""

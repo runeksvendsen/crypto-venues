@@ -10,18 +10,16 @@ import qualified Data.Aeson.Types   as Json
 type PriceStr = String
 type QtyStr = String
 
-parseOrderStr :: -- forall base quote. (KnownSymbol base, KnownSymbol quote)
-              PriceStr -> QtyStr -> Json.Parser (Order base quote)
+parseOrderStr :: PriceStr -> QtyStr -> Either String (Order base quote)
 parseOrderStr price qty =
    Order <$> parseStr "quantity" qty Money.dense
          <*> parseStr "price" price Money.exchangeRate
-   where
-   -- market = symbolVal (Proxy :: Proxy base) <> "/" <> symbolVal (Proxy :: Proxy quote)
-   parseStr :: String -> String -> (Rational -> Maybe a) -> Json.Parser a
-   parseStr name val conv =
-      maybe (fail $ "Bad order " <> name <> ": " <> val) return $ do
-          sci <- readMaybe val
-          conv (toRational sci)
 
-parseSomeOrderStr :: PriceStr -> QtyStr -> Json.Parser SomeOrder
+parseStr :: String -> String -> (Rational -> Maybe a) -> Either String a
+parseStr name val conv =
+   maybe (Left $ "Bad order " <> name <> ": " <> val) Right $ do
+       sci :: Sci.Scientific <- readMaybe val
+       conv (toRational sci)
+
+parseSomeOrderStr :: PriceStr -> QtyStr -> Either String SomeOrder
 parseSomeOrderStr price qty = fromOrder <$> parseOrderStr price qty

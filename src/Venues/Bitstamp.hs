@@ -51,7 +51,7 @@ instance Json.FromJSON Book
 type BitstampOrder = (String,String)   -- Price, Quantity
 
 parseOrder :: BitstampOrder -> Json.Parser SomeOrder
-parseOrder (price,qty) = parseSomeOrderStr price qty
+parseOrder (price,qty) = either fail return $ parseSomeOrderStr price qty
 
 instance Json.FromJSON (SomeBook "bitstamp") where
    parseJSON val =

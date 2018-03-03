@@ -94,7 +94,7 @@ instance Json.FromJSON (SomeBook "binance") where
       in Json.parseJSON val >>= fromBook >>= either fail return
 
 parseOrder :: (Text,Text,[Text]) -> Json.Parser SomeOrder
-parseOrder (price,amount,_) = parseSomeOrderStr (toS price) (toS amount)
+parseOrder (price,amount,_) = either fail return $ parseSomeOrderStr (toS price) (toS amount)
 
 -- Rate limit stuff
 type ApiRateLimit
