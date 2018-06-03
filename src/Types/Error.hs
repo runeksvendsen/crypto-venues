@@ -18,7 +18,9 @@ import GHC.Generics
 import GHC.TypeLits
 import Text.Printf
 import Control.Exception
-import Servant.Common.Req
+-- import Servant.Common.Req
+import Servant.Client.Core
+import qualified Servant.Client.Core.Reexport as S
 import Servant.Client                        as SC
 import qualified Network.HTTP.Types.Status   as Status
 
@@ -46,8 +48,8 @@ instance KnownSymbol venue => Show (ErrType venue) where
 -- |
 data FetchErr
    = TooManyRequests             -- ^ We should slow down
-   | ConnectionErr SomeException -- ^ Something's wrong with the connection
-   | EndpointErr UrlReq          -- ^ The endpoint has fucked up
+   | ConnectionErr String        -- ^ Something's wrong with the connection
+   | EndpointErr BaseUrl       -- ^ The endpoint has fucked up
    | InternalErr String          -- ^ We've fucked up
       deriving (Show, Generic)  -- TODO: Proper Show instance
 
@@ -70,22 +72,22 @@ shouldRetryFE :: FetchErr -> Bool
 shouldRetryFE TooManyRequests = True
 shouldRetryFE _               = False -- Let's be conservative to begin with
 
-fromServant :: ServantError -> FetchErr
-fromServant FailureResponse{..} =
-   handleStatusCode (Status.statusCode responseStatus) failingRequest
-fromServant (ConnectionError someEx) =
-   ConnectionErr someEx
-fromServant DecodeFailure{..} =
-   InternalErr $ "Decode error: " ++ decodeError
-fromServant UnsupportedContentType{..} =
-   InternalErr $ "Unsupported content type: " ++ show responseContentType
-fromServant InvalidContentTypeHeader{..} =
-   InternalErr $ "Invalid content type header: " ++ show responseContentTypeHeader
+fromServant :: BaseUrl -> ServantError -> FetchErr
+fromServant url (FailureResponse res) =
+   handleStatusCode (Status.statusCode $ responseStatusCode res) url
+fromServant _ (ConnectionError errText) =
+   ConnectionErr (show errText)
+fromServant _ (DecodeFailure decodeError _) =
+   InternalErr $ "Decode error: " ++ show decodeError
+fromServant _ (UnsupportedContentType mediaType _) =
+   InternalErr $ "Unsupported content type: " ++ show mediaType
+fromServant _ (InvalidContentTypeHeader res) =
+   InternalErr $ "Invalid content type header. Response: " ++ show res
 
-handleStatusCode :: Int -> UrlReq -> FetchErr
+handleStatusCode :: Int -> BaseUrl -> FetchErr
 handleStatusCode 429 _ = TooManyRequests
-handleStatusCode code req
-   | code >= 500 && code < 600 = EndpointErr req
+handleStatusCode code url
+   | code >= 500 && code < 600 = EndpointErr url
    | otherwise = InternalErr $
-      printf "Unhandled failure response. Code: %d. Req: %s" code (show req)
+      printf "Unhandled failure response. Code: %d. Url: %s" code (show url)
 

@@ -1,7 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module CPrelude
 ( module Protolude
-, module Safe
+-- , module Safe
 , module Error
 , module TypeLits
 , module Prelude
@@ -13,6 +13,7 @@ module CPrelude
 , fmapL
 , printf
 , fail
+, S.BaseUrl(..), S.Scheme(..)
 )
 where
 
@@ -21,7 +22,7 @@ import Prelude (String, Show, show, id, mod, lookup, error)
 import Types.Error as Error
 import Types.AppM as AppM
 import Debug.Trace (trace)
-import Safe
+-- import Safe hiding (atDef, atMay, foldl1May, foldr1May)
 import GHC.TypeLits as TypeLits (Symbol, KnownSymbol, SomeSymbol(..)
                                 , sameSymbol, symbolVal, someSymbolVal
                                 )
@@ -35,7 +36,7 @@ import Control.Monad.Trans.Reader
 import qualified Network.HTTP.Client   as HTTP
 
 import qualified Control.Monad.Parallel   as Par
-
+import qualified Servant.Client.Core.Reexport as S
 
 sameSym :: (KnownSymbol a, KnownSymbol b) => Proxy a -> Proxy b -> Bool
 sameSym a b = isJust (sameSymbol a b)

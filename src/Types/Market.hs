@@ -6,7 +6,6 @@ import Protolude
 --import Fetch.DataSrc
 import OrderBook.Types
 import Text.Printf
-import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client        as SC
 import           Servant.API
 import qualified Data.Aeson            as Json

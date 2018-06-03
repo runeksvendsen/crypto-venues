@@ -11,7 +11,6 @@ import OrderBook
 import Fetch
 import Types.Market
 
-import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client        as SC
 import qualified Data.Scientific as Sci
 import Servant.API
@@ -62,7 +61,7 @@ parseOrder bo@BittrexOrder{..} =
    where soM = mkSomeOrder (toRational quantity) (toRational rate)
 
 
-apiUrl = S.BaseUrl S.Https "bittrex.com" 443 ""
+apiUrl = BaseUrl Https "bittrex.com" 443 ""
 
 -- | Example: https://bittrex.com/api/v1.1/public/getorderbook?market=BTC-ADA&type=both
 type Api base quote

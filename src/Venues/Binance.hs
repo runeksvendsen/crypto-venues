@@ -7,7 +7,6 @@ import Fetch
 import Types.Market
 import Venues.Common.StringArrayOrder  (parseSomeOrderStr)
 
-import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client        as SC
 import Servant.API
 import qualified Data.Aeson   as Json
@@ -18,8 +17,8 @@ import qualified Data.Text as T
 import qualified Data.Vector  as Vec
 
 
-apiUrl :: S.BaseUrl
-apiUrl = S.BaseUrl S.Https "api.binance.com" 443 "/api/v1"
+apiUrl :: BaseUrl
+apiUrl = BaseUrl Https "api.binance.com" 443 "/api/v1"
 
 -- | https://api.binance.com/api/v1/exchangeInfo
 type ApiMarkets

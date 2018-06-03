@@ -41,9 +41,9 @@ dependencies:
 - protolude
 - safe-money
 - orderbook
-- hash-graph
 - servant
 - servant-client
+- servant-client-core
 - servant-server
 - servant-docs
 - aeson
@@ -68,6 +68,7 @@ dependencies:
 - retry
 - rate-limit
 - time-units
+- haskell-igraph  # Paths.hs
 
 library:
   source-dirs: src

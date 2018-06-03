@@ -9,7 +9,6 @@ import Fetch
 import Types.Market
 import Venues.Common.StringArrayOrder  (parseSomeOrderStr)
 
-import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client        as SC
 import Servant.API
 import qualified Data.Aeson   as Json
@@ -56,8 +55,8 @@ instance Json.FromJSON BitfinexOrder
 parseOrder :: BitfinexOrder -> Json.Parser SomeOrder
 parseOrder BitfinexOrder{..} = either fail return $ parseSomeOrderStr price amount
 
-apiUrl :: S.BaseUrl
-apiUrl = S.BaseUrl S.Https "api.bitfinex.com" 443 ""
+apiUrl :: BaseUrl
+apiUrl = BaseUrl Https "api.bitfinex.com" 443 ""
 
 type Api base quote
    = "v1"

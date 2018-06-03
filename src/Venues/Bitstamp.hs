@@ -8,7 +8,6 @@ import Fetch
 import Types.Market
 import Venues.Common.StringArrayOrder  (parseSomeOrderStr)
 
-import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client        as SC
 import Servant.API
 import qualified Data.Aeson   as Json
@@ -31,7 +30,7 @@ instance EnumMarkets "bitstamp" where
          clientM = SC.client (Proxy :: Proxy ApiMarkets)
 
 -- Base URL
-apiUrl = S.BaseUrl S.Https "www.bitstamp.net" 443 ""
+apiUrl = BaseUrl Https "www.bitstamp.net" 443 ""
 
 -- Orderbook
 type ApiOb

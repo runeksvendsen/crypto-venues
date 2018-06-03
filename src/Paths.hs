@@ -4,8 +4,9 @@ import CPrelude
 import Types.Market
 import Fetch.MarketBook
 import Venues
-import Data.HashGraph.Strict              (Edge(..), mkGraph)
-import Data.HashGraph.Algorithms          (pathTree)
+import qualified IGraph as G
+-- import Data.HashGraph.Strict              (Edge(..), mkGraph)
+-- import Data.HashGraph.Algorithms          (pathTree)
 import qualified Control.Monad.Parallel   as Par
 import Data.List  hiding (map, intercalate)
 import qualified Data.Text as T

@@ -5,7 +5,7 @@ import Fetch.DataSrc
 import Types.RateLimit
 import OrderBook.Types
 import Types.Market
-import qualified Servant.Common.BaseUrl as S
+import qualified Servant.Client.Core.Reexport as S
 import qualified Servant.Client        as SC
 import           Servant.API
 import qualified Data.Aeson            as Json

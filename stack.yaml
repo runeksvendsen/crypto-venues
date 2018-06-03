@@ -1,4 +1,4 @@
-resolver: lts-10.5
+resolver: nightly-2018-05-30
 
 packages:
 - .
@@ -6,29 +6,35 @@ packages:
     git: https://github.com/runeksvendsen/orderbook.git
     commit: 1e89783eb0bcdf7d138c9b13af98931ecb14be76
   extra-dep: true
-- location:
-    git: https://github.com/patrickdoc/hash-graph.git
-    commit: f18b143bfbbb936806c8d33bdcbc4d8970f11391
-  extra-dep: true
+# - location:
+#     git: https://github.com/patrickdoc/hash-graph.git
+#     commit: f18b143bfbbb936806c8d33bdcbc4d8970f11391
+#   extra-dep: true
 
 #- ../orderbook
 
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
 extra-deps:
+- haskell-igraph-0.7.0
+- rate-limit-1.4.0
 - safe-money-0.4.1
+- time-units-1.0.0
 ### BEGIN safe-money deps
 - serialise-0.2.0.0
-- xmlbf-0.2
 - cborg-0.2.0.0
+- half-0.2.2.3
 ### END safe-money deps
-- rate-limit-1.4.0
+
 ### BEGIN rate-limit deps
-- time-units-1.0.0
+
 ### END rate-limit deps
 ### BEGIN test deps
-- hspec-smallcheck-0.5.0  # make "shouldBe" work with "SS.property"
+
 ### END test deps
+### BEGIN Paths.hs deps
+
+### END Paths.hs deps
 
 #flags:
 #  safe-money:

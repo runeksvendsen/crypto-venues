@@ -8,7 +8,6 @@ import Fetch
 import Types.Market
 import Venues.Common.StringArrayOrder  (parseOrderStr)
 
-import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client as SC
 import Servant.API
 import qualified Data.Aeson   as Json
@@ -38,7 +37,7 @@ parseOrder :: GDAXl3Order -> Json.Parser (Order base quote)
 parseOrder (price,qty,_) = either fail return $ parseOrderStr price qty
 
 gdax :: SC.BaseUrl
-gdax = S.BaseUrl S.Https "api.gdax.com" 443 ""
+gdax = BaseUrl Https "api.gdax.com" 443 ""
 
 type Api base quote
    = "products"

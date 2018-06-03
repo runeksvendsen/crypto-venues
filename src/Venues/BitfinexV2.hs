@@ -8,7 +8,7 @@ import Fetch
 import Types.Market
 --import Venues.Common.StringArrayOrder  (parseOrderStr)
 
-import qualified Servant.Common.BaseUrl as S
+import qualified Servant.Client.Core.Reexport as S
 import qualified Servant.Client        as SC
 import Servant.API
 import qualified Data.Aeson   as Json
@@ -49,8 +49,8 @@ parseBook book = do
       sellOrders = fmap fixSellQty . Vec.filter ((< 0) . oQuantity)
       fixSellQty order@Order{..} = order { oQuantity = abs oQuantity }
 
-bitfinex :: S.BaseUrl
-bitfinex = S.BaseUrl S.Https "api.bitfinex.com" 443 ""
+bitfinex :: BaseUrl
+bitfinex = BaseUrl Https "api.bitfinex.com" 443 ""
 
 type Api base quote
    = "v2"
