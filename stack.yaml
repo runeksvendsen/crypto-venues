@@ -26,6 +26,7 @@ extra-deps:
 ### BEGIN rate-limit deps
 - time-units-1.0.0
 ### END rate-limit deps
+- logging-3.0.5
 ### BEGIN test deps
 - hspec-smallcheck-0.5.0  # make "shouldBe" work with "SS.property"
 ### END test deps

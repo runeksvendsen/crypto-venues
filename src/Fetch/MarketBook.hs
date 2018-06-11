@@ -57,7 +57,7 @@ fetchMarketBook
    => Market venue
    -> AppM IO (AnyBook venue)
 fetchMarketBook market@Market{..} = do
-   man <- ask
+   man <- asks cfgMan
    let handleErr = throwLeft . fmapL (Error (BookErr market))
    ob <- handleErr =<< liftIO (srcFetch man (marketBook miApiSymbol))
    return $ bookFromMarket market ob

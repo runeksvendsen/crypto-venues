@@ -19,7 +19,7 @@ minNumMarkets :: Int
 minNumMarkets = 5
 
 spec :: HTTP.Manager -> Spec
-spec man =
+spec man = parallel $
    forM_ Venues.allVenues (testVenue man)
 
 testVenue :: HTTP.Manager -> AnyVenue -> Spec
@@ -28,7 +28,6 @@ testVenue man av@(AnyVenue venue) =
       describe ("for " ++ show av) $
          parallel $ do
             testMarketListLength man
-            -- testFetchArbOrderbook man
             RateLimit.testRateLimitFetch man
 
 testMarketListLength :: HTTP.Manager -> SpecWith (Arg ([Market venue] -> IO ()))
@@ -36,21 +35,22 @@ testMarketListLength man =
    it ("we can fetch at least " ++ show minNumMarkets ++ " markets") $ \markets ->
       length markets `shouldSatisfy` (>= minNumMarkets)
 
-testFetchArbOrderbook
-   :: MarketBook venue
-   => HTTP.Manager
-   -> SpecWith (Arg ([Market venue] -> IO ()))
-testFetchArbOrderbook man =
-   it "we can fetch a randomly chosen market order book" $ \markets -> do
-      market <- QC.generate (QC.elements markets)
-      bookE <- runAppM man $ fetchMarketBook market
-      bookE `shouldSatisfy` isRight
+--testFetchArbOrderbook
+--   :: MarketBook venue
+--   => HTTP.Manager
+--   -> SpecWith (Arg ([Market venue] -> IO ()))
+--testFetchArbOrderbook man =
+--   it "we can fetch a randomly chosen market order book" $ \markets -> do
+--      market <- QC.generate (QC.elements markets)
+--      bookE <- runAppM man $ fetchMarketBook market
+--      bookE `shouldSatisfy` isRight
 
 withMarketList
-   :: forall venue. EnumMarkets venue
+   :: forall venue a. EnumMarkets venue
    => HTTP.Manager
    -> Proxy venue
-   -> ([Market venue] -> IO ()) -> IO ()
+   -> ([Market venue] -> IO a)
+   -> IO a
 withMarketList man venue f = do
    markets <- failOnErr =<< runAppM man (marketList venue)
    f markets

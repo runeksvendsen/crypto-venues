@@ -9,8 +9,6 @@ import Data.HashGraph.Algorithms          (pathTree)
 import qualified Control.Monad.Parallel   as Par
 import Data.List  hiding (map, intercalate)
 import qualified Data.Text as T
---TEST
---import Control.DeepSeq
 
 
 toEdge :: AnyMarket -> Edge AnyMarket Text
