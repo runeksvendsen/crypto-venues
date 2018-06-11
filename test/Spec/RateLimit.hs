@@ -1,5 +1,5 @@
 module Spec.RateLimit
-( testRateLimitFetch )
+( testRateLimitFetch, rateLimitFetch )
 where
 
 import CPrelude
@@ -20,11 +20,20 @@ testRateLimitFetch
    => HTTP.Manager
    -> SpecWith (Arg ([Market venue] -> IO ()))
 testRateLimitFetch man =
-   it ("we can do rate-limited fetch of " ++ show numOrderbooks ++ " order books") $ \markets -> do
-      someMarkets <- QC.generate (QC.shuffle markets)
-      let marketLst = take numOrderbooks someMarkets
-      bookLstE <- runAppM man $ Throttle.fetchRateLimited marketLst
-      bookLstE `shouldSatisfy` isRight
-      let Just bookLst = rightToMaybe bookLstE
-      return $ rnf bookLst
-      length bookLst `shouldBe` length marketLst
+   it ("we can do rate-limited fetch of " ++ show numOrderbooks ++ " order books") $
+      rateLimitFetch man
+
+rateLimitFetch
+   :: MarketBook venue
+   => HTTP.Manager
+   -> [Market venue]
+   -> IO ()
+rateLimitFetch man markets = do
+   someMarkets <- QC.generate (QC.shuffle markets)
+   let marketLst = take numOrderbooks someMarkets
+   bookLstE <- runAppM man $ Throttle.fetchRateLimited marketLst
+   bookLstE `shouldSatisfy` isRight
+   let Just bookLst = rightToMaybe bookLstE
+   return $ rnf bookLst
+   length bookLst `shouldBe` length marketLst
+

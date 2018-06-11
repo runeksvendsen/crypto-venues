@@ -22,7 +22,7 @@ marketList
    => Proxy venue
    -> AppM m [Market venue]
 marketList p = do
-   man <- ask
+   man <- asks cfgMan
    let handleErr = throwLeft . fmapL (Error (VenueEnumErr p))
    res :: MarketList venue <- handleErr =<< srcFetch man allMarkets
    return $ getMarkets res

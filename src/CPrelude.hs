@@ -14,6 +14,10 @@ module CPrelude
 , printf
 , fail
 , S.BaseUrl(..), S.Scheme(..)
+, show'
+-- * Logging
+--, info
+--, infoS
 )
 where
 
@@ -34,9 +38,11 @@ import Text.Printf
 import Data.EitherR (fmapL)
 import Control.Monad.Trans.Reader
 import qualified Network.HTTP.Client   as HTTP
-
 import qualified Control.Monad.Parallel   as Par
 import qualified Servant.Client.Core.Reexport as S
+
+show' :: Show a => a -> Text
+show' = toS . show
 
 sameSym :: (KnownSymbol a, KnownSymbol b) => Proxy a -> Proxy b -> Bool
 sameSym a b = isJust (sameSymbol a b)
