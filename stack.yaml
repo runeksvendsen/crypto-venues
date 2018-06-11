@@ -4,7 +4,7 @@ packages:
 - .
 - location:
     git: https://github.com/runeksvendsen/orderbook.git
-    commit: 1e89783eb0bcdf7d138c9b13af98931ecb14be76
+    commit: 02593045e231f3eaf4de46b5c698e07bc4edbc07
   extra-dep: true
 # - location:
 #     git: https://github.com/patrickdoc/hash-graph.git

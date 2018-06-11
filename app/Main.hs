@@ -11,6 +11,8 @@ import qualified Log
 import Control.Monad
 import qualified Control.Monad.Parallel   as Par
 
+import qualified Paths
+import qualified Types.AppM as AppM
 
 logLevel = Log.LevelDebug
 numMarkets = 30
@@ -19,7 +21,8 @@ main = Log.withStderrLogging $ do
    Log.setLogLevel logLevel
    Log.setLogTimeFormat "%T:%3q"
    man <- HTTPS.newTlsManager
-   forVenues man (testVenue man)
+   either (error . show) return =<< AppM.runAppM man Paths.main
+   --forVenues man (testVenue man)
 
 forVenues :: HTTP.Manager
           -> (AnyVenue -> IO a)

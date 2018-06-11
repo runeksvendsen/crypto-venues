@@ -11,6 +11,7 @@ module Types.Error
 where
 
 import Prelude
+import Protolude.Conv (toS)
 import Types.Market
 import Data.Proxy
 import Control.DeepSeq
@@ -74,7 +75,7 @@ shouldRetryFE _               = False -- Let's be conservative to begin with
 
 fromServant :: BaseUrl -> ServantError -> FetchErr
 fromServant url (FailureResponse res) =
-   handleStatusCode (Status.statusCode $ responseStatusCode res) url
+   handleStatusCode res url
 fromServant _ (ConnectionError errText) =
    ConnectionErr (show errText)
 fromServant _ (DecodeFailure decodeError _) =
@@ -84,10 +85,18 @@ fromServant _ (UnsupportedContentType mediaType _) =
 fromServant _ (InvalidContentTypeHeader res) =
    InternalErr $ "Invalid content type header. Response: " ++ show res
 
-handleStatusCode :: Int -> BaseUrl -> FetchErr
-handleStatusCode 429 _ = TooManyRequests
-handleStatusCode code url
-   | code >= 500 && code < 600 = EndpointErr url
-   | otherwise = InternalErr $
-      printf "Unhandled failure response. Code: %d. Url: %s" code (show url)
+handleStatusCode :: Response -> BaseUrl -> FetchErr
+handleStatusCode res url
+    | statusCode == 429 = TooManyRequests
+    | statusCode >= 500 && statusCode < 600 = EndpointErr url
+    | otherwise = InternalErr $
+        printf "Unhandled failure response. Code: %d. Msg: %s. Url: %s. Body: %s"
+               statusCode
+               (toS $ Status.statusMessage status :: String)
+               (show url)
+               (show $ responseBody res)
+  where
+    status = responseStatusCode res
+    statusCode = Status.statusCode status
+
 

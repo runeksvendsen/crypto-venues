@@ -84,6 +84,7 @@ toRateMap
     -> USDRateMap
 toRateMap nodeMap g =
       foldr insertRate Map.empty
+    $ traceIt
     $ catMaybes
     $ map (toRate g)
     $ allPaths (symNode "USD") g
@@ -124,7 +125,7 @@ buildGraphM toEdges =
         -> GraphM m (gr Text edgeLabel)
     insertBook ab@(ABook anyBook) g = do
         bimap <- S.get
-        let (baseSym, quoteSym) = traceIt $ (abBase anyBook, abQuote anyBook)
+        let (baseSym, quoteSym) = (abBase anyBook, abQuote anyBook)
             (baseNode,  baseBimap)  = symbolNode baseSym bimap
             (quoteNode, quoteBimap) = symbolNode quoteSym baseBimap
         S.put quoteBimap
@@ -178,7 +179,7 @@ abBase
     -> Text
 abBase (AnyBook ob) =
     case ob of
-        (ob :: OrderBook base quote venue) ->
+        (ob :: OrderBook venue base quote) ->
             toS $ symbolVal (Proxy :: Proxy base) :: Text
 
 abQuote
@@ -186,9 +187,8 @@ abQuote
     -> Text
 abQuote (AnyBook ob) =
     case ob of
-        (ob :: OrderBook base quote venue) ->
+        (ob :: OrderBook venue base quote) ->
             toS $ symbolVal (Proxy :: Proxy quote) :: Text
-
 
 allPaths
     :: G.Graph gr
@@ -202,12 +202,10 @@ allPaths start g =
     -- -- Note that the label of the first node in a returned path is meaningless;
     -- -- all other nodes are paired with the label of their incoming edge.
 
-
 main = do
     books <- allBooks
     print $ buildRateMap books
     return ()
-
 
 allBooks :: AppM IO [ABook]
 allBooks =
