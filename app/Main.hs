@@ -17,12 +17,23 @@ import qualified Types.AppM as AppM
 logLevel = Log.LevelDebug
 numMarkets = 30
 
+-- HTTP.managerModifyRequest
+-- HTTPS.tlsManagerSettings
+
+logRequest :: HTTP.Request -> IO HTTP.Request
+logRequest req = do
+    putStrLn $ "### " ++ toS logStr
+    return req
+  where
+    logStr = HTTP.host req <> HTTP.path req <> HTTP.queryString req
+
 main = Log.withStderrLogging $ do
    Log.setLogLevel logLevel
    Log.setLogTimeFormat "%T:%3q"
-   man <- HTTPS.newTlsManager
+   -- HTTPS.newTlsManager
+   man <- HTTP.newManager HTTPS.tlsManagerSettings { HTTP.managerModifyRequest = logRequest }
    either (error . show) return =<< AppM.runAppM man Paths.main
-   --forVenues man (testVenue man)
+
 
 forVenues :: HTTP.Manager
           -> (AnyVenue -> IO a)

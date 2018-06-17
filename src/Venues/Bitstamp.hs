@@ -19,7 +19,7 @@ import Control.Monad.Fail
 
 
 instance MarketBook "bitstamp" where
-   marketBook apiSymbol = DataSrc apiUrl (cm apiSymbol)
+   marketBook apiSymbol = DataSrc apiUrl (cm apiSymbol (Just userAgent))
       where cm = SC.client (Proxy :: Proxy ApiOb)
    rateLimit = DataSrc apiUrl (return . fromRational . toRational $ 1)
    -- Rate limit: 600 requests per 10 minutes (https://www.bitstamp.net/api/)
@@ -32,12 +32,17 @@ instance EnumMarkets "bitstamp" where
 -- Base URL
 apiUrl = BaseUrl Https "www.bitstamp.net" 443 ""
 
+userAgent :: Text
+userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36"
+
+
 -- Orderbook
 type ApiOb
    = "api"
    :> "v2"
    :> "order_book"
    :> Capture "symbol" Text
+   :> Header "User-Agent" Text
    :> Get '[JSON] (SomeBook "bitstamp")
 
 data Book = Book

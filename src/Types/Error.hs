@@ -21,7 +21,6 @@ import Text.Printf
 import Control.Exception
 -- import Servant.Common.Req
 import Servant.Client.Core
-import qualified Servant.Client.Core.Reexport as S
 import Servant.Client                        as SC
 import qualified Network.HTTP.Types.Status   as Status
 
@@ -48,11 +47,14 @@ instance KnownSymbol venue => Show (ErrType venue) where
 
 -- |
 data FetchErr
-   = TooManyRequests             -- ^ We should slow down
-   | ConnectionErr String        -- ^ Something's wrong with the connection
-   | EndpointErr BaseUrl       -- ^ The endpoint has fucked up
-   | InternalErr String          -- ^ We've fucked up
+   = TooManyRequests            -- ^ We should slow down
+   | ConnectionErr String       -- ^ Something's wrong with the connection
+   | EndpointErr BaseUrl        -- ^ The endpoint messed up
+   | InternalErr String         -- ^ We messed up
       deriving (Show, Generic)  -- TODO: Proper Show instance
+
+-- instance Show FetchErr where
+--     show (EndpointErr url) = "EndpointErr: " ++ show (showBaseUrl url)
 
 data VenueFetchErr
    = forall venue.
@@ -70,8 +72,8 @@ shouldRetry Error{..} = shouldRetryFE eFetchErr
 
 -- | Should we retry a failed request?
 shouldRetryFE :: FetchErr -> Bool
-shouldRetryFE TooManyRequests = True
-shouldRetryFE _               = False -- Let's be conservative to begin with
+shouldRetryFE (InternalErr _) = False
+shouldRetryFE _ = True
 
 fromServant :: BaseUrl -> ServantError -> FetchErr
 fromServant url (FailureResponse res) =
@@ -90,11 +92,11 @@ handleStatusCode res url
     | statusCode == 429 = TooManyRequests
     | statusCode >= 500 && statusCode < 600 = EndpointErr url
     | otherwise = InternalErr $
-        printf "Unhandled failure response. Code: %d. Msg: %s. Url: %s. Body: %s"
+        printf "Unhandled failure response. Code: %d. Msg: %s. Url: %s. Body:\n%s"
                statusCode
-               (toS $ Status.statusMessage status :: String)
-               (show url)
-               (show $ responseBody res)
+               (show (toS $ Status.statusMessage status :: String))
+               (show $ SC.showBaseUrl url)
+               (toS $ responseBody res :: String)
   where
     status = responseStatusCode res
     statusCode = Status.statusCode status

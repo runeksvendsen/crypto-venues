@@ -27,7 +27,7 @@ allVenues =
    [ AnyVenue (Proxy :: Proxy "bitfinex")
    , AnyVenue (Proxy :: Proxy "bittrex")
    , AnyVenue (Proxy :: Proxy "binance")
-   , AnyVenue (Proxy :: Proxy "bitstamp")
+--    , AnyVenue (Proxy :: Proxy "bitstamp")
    ]
 
 -- | Map of all supported venue names to its corresponding 'AnyVenue'
