@@ -1,55 +1,98 @@
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE ParallelListComp #-}
 module Paths where
 
 import CPrelude
+import Prelude (unlines)
+import qualified Paths.Paths as Paths
 import Types.Market
 import Fetch.MarketBook
-import Venues
-import Data.HashGraph.Strict              (Edge(..), mkGraph)
-import Data.HashGraph.Algorithms          (pathTree)
+import qualified Fetch.Throttle as Throttle
+import qualified Fetch.EnumMarkets as EnumMarkets
+import qualified Venues
 import qualified Control.Monad.Parallel   as Par
-import Data.List  hiding (map, intercalate)
-import qualified Data.Text as T
+import qualified Data.HashMap.Strict as Map
 
 
-toEdge :: AnyMarket -> Edge AnyMarket Text
-toEdge am@(AnyMarket market) =
-   Edge (miBase market) am (miQuote market)
+-- main = do
+--     putStrLn test_fromLabeledNodes1
+--     putStrLn test_fromLabeledNodes2
+--     putStrLn test_fromLabeledNodes3
+--     putStrLn test_fromLabeledNodes4
 
-allMarkets :: (Par.MonadParallel m, MonadIO m) => AppM m [AnyMarket]
-allMarkets = do
-   allMarketsLst <- Par.forM allVenues marketListAny
-   return $ concat allMarketsLst
-
-allEdges :: (Par.MonadParallel m, MonadIO m) => AppM m [Edge AnyMarket Text]
-allEdges = do
-   marketLst <- allMarkets
-   let mktLst = map toEdge (nub marketLst)
-   return mktLst
-
--- | Get a list of nodes along a path of non-cyclical edges
-getNodes :: [Edge AnyMarket Text] -> [Text]
-getNodes = nub . concatMap toVertices -- Get all vertices and remove duplicates
-   where toVertices (Edge v1 _ v2) = [v1, v2]
-
-invert :: Edge AnyMarket Text -> Edge AnyMarket Text
-invert (Edge v1 am v2) = Edge v2 am v1
-
-main :: (Par.MonadParallel m, MonadIO m) => AppM m ()
+main :: AppM IO ()
 main = do
-   edges <- allEdges
-   putStrLn $ "Edges: " ++ show (length edges)
-   putStrLn $ "Nodes: " ++ show (length $ getNodes edges)
+    books <- allBooks
+    let rateMap = Paths.buildRateMap books
+        (depthGraph, nodeMap) = Paths.buildDepthGraph rateMap books
+        lookupOrFail sym = fromMaybe (error $ "main: symbol not found: " ++ show sym) $
+            Map.lookup sym nodeMap
+        (btcNode, usdNode) = (lookupOrFail "BTC", lookupOrFail "USD")
+    print "###### liquidPaths ######"
+    mapM_ print $ take 25 $ Paths.liquidPaths rateMap nodeMap depthGraph btcNode usdNode
 
---   let someEdges = edges -- take 400 edges
---       mkUndirected edgs = edgs ++ map invert edgs
---       graph = mkGraph (mkUndirected someEdges) (getNodes someEdges)
---        -- All paths going from "USD"
---       paths = pathTree "USD" graph
---        -- Pretty path, e.g. "EUR->JPY->GBP"
---       prettyPath edgeL = T.intercalate "->" (getNodes edgeL)
---       hasEnd node = (\(Edge _ _ dst) -> dst == node) . last
---       edgeData (Edge _ ed _) = ed
---       ethPaths = filter (hasEnd "ETH") paths
---   paths `deepseq` putStrLn ("DONE!" :: String)
---   forM_ paths (putStrLn . prettyPath)
 
+allBooks :: AppM IO [Paths.ABook]
+allBooks =
+   concat <$> Par.forM Venues.allVenues fetchVenueBooks
+
+fetchVenueBooks
+   :: AnyVenue
+   -> AppM IO [Paths.ABook]
+fetchVenueBooks (AnyVenue p) = do
+    mktList :: [Market venue] <- EnumMarkets.marketList p
+    let btcUsdL = filter (\mkt -> miBase mkt == "BTC" && miQuote mkt == "USD") mktList
+        marketName = symbolVal (Proxy :: Proxy venue)
+        markets = take 30 mktList
+        marketList = case btcUsdL of
+            []       -> markets
+            [btcUsd] -> btcUsd : filter (/= btcUsd) markets
+            _ -> error $ marketName ++ ": multiple BTC/USD markets"
+    when (null btcUsdL) $
+        putStrLn $ marketName ++ ": no BTCUSD market"
+    map Paths.ABook <$> Throttle.fetchRateLimited marketList
+
+
+{-
+
+test_fromLabeledNodes1 = do
+    let res = Paths.fromLabeledNodes [(1,"X"), (2,"e"), (3,"n"), (4,"u"), (5,"R")]
+        exp = [(5,4,"R"), (4,3,"u"), (3,2,"n"), (2,1,"e")]
+    if res == exp
+        then "Success!"
+        else unlines [ "Expected: " ++ show exp
+                     , "Found: " ++ show res
+                     ]
+
+test_fromLabeledNodes2 = do
+    let res = Paths.fromLabeledNodes [(1,"X"), (20,"BTC/USD")]
+        exp = [(20,1,"BTC/USD")]
+    if res == exp
+        then "Success!"
+        else unlines [ "Expected: " ++ show exp
+                     , "Found: " ++ show res
+                     ]
+
+test_fromLabeledNodes3 = do
+    let res = Paths.fromLabeledNodes [(20,"X"), (1,"BTC/USD")]
+        exp = [(1,20,"BTC/USD")]
+    if res == exp
+        then "Success!"
+        else unlines [ "Expected: " ++ show exp
+                     , "Found: " ++ show res
+                     ]
+
+
+test_fromLabeledNodes4 = do
+    let res = Paths.fromLabeledNodes [(20,"X"), (1,"BTC/USD"), (15,"RDD/BTC")]
+        exp  = [(15,1,"RDD/BTC"), (1,20,"BTC/USD")]
+        expR = [(1,20,"BTC/USD"), (15,1,"RDD/BTC")]
+    if res == exp
+        then "Success!"
+        else unlines [ "Expected: " ++ show exp
+                     , "Found: " ++ show res
+                     ]
+
+
+-}

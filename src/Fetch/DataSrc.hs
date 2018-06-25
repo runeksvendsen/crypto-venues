@@ -2,7 +2,6 @@
 module Fetch.DataSrc where
 
 import CPrelude
-import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client        as SC
 import           Servant.API
 import qualified Data.Aeson            as Json
@@ -10,7 +9,7 @@ import qualified Network.HTTP.Client   as HTTP
 
 
 data DataSrc dataType = DataSrc
-   { dsUrl     :: S.BaseUrl
+   { dsUrl     :: BaseUrl
    , dsClientM :: SC.ClientM dataType
    }
 
@@ -21,6 +20,7 @@ srcFetch
    -> DataSrc dataType
    -> m (Either FetchErr dataType)
 srcFetch man ds = liftIO cmRes
-   where cmRes = fmapL fromServant <$> SC.runClientM (dsClientM ds) env
-         env = SC.ClientEnv man (dsUrl ds)
+   where cmRes = fmapL (fromServant url) <$> SC.runClientM (dsClientM ds) env
+         env = SC.ClientEnv man url Nothing
+         url = dsUrl ds
 

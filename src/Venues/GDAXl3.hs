@@ -8,7 +8,6 @@ import Fetch
 import Types.Market
 import Venues.Common.StringArrayOrder  (parseOrderStr)
 
-import qualified Servant.Common.BaseUrl as S
 import qualified Servant.Client as SC
 import Servant.API
 import qualified Data.Aeson   as Json
@@ -20,8 +19,8 @@ import qualified Data.Aeson.Types   as Json
 instance Json.FromJSON (OrderBook "gdax-l3" base quote) where
    parseJSON val =
       let fromBook Book{..} = OrderBook
-            <$> traverse parseOrder bids
-            <*> traverse parseOrder asks
+            <$> (BuySide <$> traverse parseOrder bids)
+            <*> (SellSide <$> traverse parseOrder asks)
       in Json.parseJSON val >>= fromBook
 
 data Book = Book
@@ -38,7 +37,7 @@ parseOrder :: GDAXl3Order -> Json.Parser (Order base quote)
 parseOrder (price,qty,_) = either fail return $ parseOrderStr price qty
 
 gdax :: SC.BaseUrl
-gdax = S.BaseUrl S.Https "api.gdax.com" 443 ""
+gdax = BaseUrl Https "api.gdax.com" 443 ""
 
 type Api base quote
    = "products"

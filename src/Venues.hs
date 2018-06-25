@@ -17,7 +17,6 @@ import Venues.Bittrex      as Bittrex        ()
 import Venues.Binance      as Binance        ()
 
 import qualified Network.HTTP.Client   as HTTP
-import qualified Servant.Common.Req    as Req
 import qualified Servant.Client        as SC
 import qualified Data.HashMap.Strict   as HM
 
@@ -28,12 +27,12 @@ allVenues =
    [ AnyVenue (Proxy :: Proxy "bitfinex")
    , AnyVenue (Proxy :: Proxy "bittrex")
    , AnyVenue (Proxy :: Proxy "binance")
-   , AnyVenue (Proxy :: Proxy "bitstamp")
+--    , AnyVenue (Proxy :: Proxy "bitstamp")
    ]
 
 -- | Map of all supported venue names to its corresponding 'AnyVenue'
 venueMap :: HM.HashMap Text AnyVenue
-!venueMap = HM.fromList $ map (\v@(AnyVenue p) -> (toS $ symbolVal p, v)) allVenues
+venueMap = HM.fromList $ map (\v@(AnyVenue p) -> (toS $ symbolVal p, v)) allVenues
 
 -- | Lookup by 'Text' string in the map of all venues
 venueLookup :: Text -> Maybe AnyVenue
