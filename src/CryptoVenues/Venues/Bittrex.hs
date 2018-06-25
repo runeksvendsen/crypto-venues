@@ -1,15 +1,15 @@
 {-
    https://bittrex.com/home/api
 -}
-module Venues.Bittrex
+module CryptoVenues.Venues.Bittrex
 ()
 where
 
-import CPrelude
+import CryptoVenues.Internal.CPrelude
 import Prelude (getChar)
 import OrderBook
-import Fetch
-import Types.Market
+import CryptoVenues.Fetch
+import CryptoVenues.Types.Market
 
 import qualified Servant.Client        as SC
 import qualified Data.Scientific as Sci

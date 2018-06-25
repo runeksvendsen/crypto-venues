@@ -1,11 +1,11 @@
 {-# LANGUAGE LambdaCase #-}
-module Venues.Binance where
+module CryptoVenues.Venues.Binance where
 
-import CPrelude
+import CryptoVenues.Internal.CPrelude
 import OrderBook
-import Fetch
-import Types.Market
-import Venues.Common.StringArrayOrder  (parseSomeOrderStr)
+import CryptoVenues.Fetch
+import CryptoVenues.Types.Market
+import CryptoVenues.Venues.Common.StringArrayOrder  (parseSomeOrderStr)
 
 import qualified Servant.Client        as SC
 import Servant.API

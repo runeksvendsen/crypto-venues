@@ -1,5 +1,5 @@
 {-# LANGUAGE ExistentialQuantification #-}
-module Types.Error
+module CryptoVenues.Types.Error
 ( Error(..)
 , ErrType(..)
 , FetchErr(..)
@@ -12,7 +12,7 @@ where
 
 import Prelude
 import Protolude.Conv (toS)
-import Types.Market
+import CryptoVenues.Types.Market
 import Data.Proxy
 import Control.DeepSeq
 import GHC.Generics

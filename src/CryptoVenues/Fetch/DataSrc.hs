@@ -1,7 +1,7 @@
 {-# LANGUAGE TypeOperators #-}
-module Fetch.DataSrc where
+module CryptoVenues.Fetch.DataSrc where
 
-import CPrelude
+import CryptoVenues.Internal.CPrelude
 import qualified Servant.Client        as SC
 import           Servant.API
 import qualified Data.Aeson            as Json

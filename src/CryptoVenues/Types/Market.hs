@@ -1,9 +1,9 @@
 --{-# LANGUAGE ExistentialQuantification #-}
-module Types.Market where
+module CryptoVenues.Types.Market where
 
 import Prelude
 import Protolude
---import Fetch.DataSrc
+--import CryptoVenues.Fetch.DataSrc
 import OrderBook.Types
 import Text.Printf
 import qualified Servant.Client        as SC

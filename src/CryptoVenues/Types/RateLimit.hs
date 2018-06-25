@@ -1,9 +1,9 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Types.RateLimit
+module CryptoVenues.Types.RateLimit
 ( RateLimit )
 where
 
-import CPrelude
+import CryptoVenues.Internal.CPrelude
 import qualified Control.Concurrent    as C
 import qualified Data.Time.Units    as Time
 

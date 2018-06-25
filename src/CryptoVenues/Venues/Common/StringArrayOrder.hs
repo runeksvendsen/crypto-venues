@@ -1,6 +1,6 @@
-module Venues.Common.StringArrayOrder where
+module CryptoVenues.Venues.Common.StringArrayOrder where
 
-import CPrelude
+import CryptoVenues.Internal.CPrelude
 import OrderBook.Types
 import qualified Money
 import qualified Data.Scientific as Sci

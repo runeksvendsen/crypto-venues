@@ -1,12 +1,12 @@
-module Venues.BitfinexV2
+module CryptoVenues.Venues.BitfinexV2
 ()
 where
 
-import CPrelude
+import CryptoVenues.Internal.CPrelude
 import OrderBook
-import Fetch
-import Types.Market
---import Venues.Common.StringArrayOrder  (parseOrderStr)
+import CryptoVenues.Fetch
+import CryptoVenues.Types.Market
+--import CryptoVenues.Venues.Common.StringArrayOrder  (parseOrderStr)
 
 import qualified Servant.Client.Core.Reexport as S
 import qualified Servant.Client        as SC

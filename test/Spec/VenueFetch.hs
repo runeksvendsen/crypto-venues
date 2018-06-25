@@ -1,14 +1,14 @@
-module Spec.VenueFetch
+module CryptoVenues.Spec.VenueFetch
 ( spec )
 where
 
-import CPrelude
+import CryptoVenues.Internal.CPrelude
 import qualified Venues
 import qualified Spec.RateLimit as RateLimit
-import Fetch
+import CryptoVenues.Fetch
 
-import Types.Market
-import Fetch
+import CryptoVenues.Types.Market
+import CryptoVenues.Fetch
 import Test.Hspec
 import qualified Network.HTTP.Client   as HTTP
 import qualified Test.QuickCheck    as QC

@@ -1,22 +1,22 @@
-module Venues.GDAXl3
+module CryptoVenues.Venues.GDAXl2
+
 ()
 where
 
-import CPrelude
+import CryptoVenues.Internal.CPrelude
 import OrderBook
-import Fetch
-import Types.Market
-import Venues.Common.StringArrayOrder  (parseOrderStr)
+import CryptoVenues.Fetch
+import CryptoVenues.Types.Market
+import CryptoVenues.Venues.Common.StringArrayOrder  (parseOrderStr)
 
-import qualified Servant.Client as SC
+import qualified Servant.Client        as SC
 import Servant.API
 import qualified Data.Aeson   as Json
 import           Data.Vector  (Vector)
---import Control.Monad.Fail
+import Control.Monad.Fail
 import qualified Data.Aeson.Types   as Json
 
-
-instance Json.FromJSON (OrderBook "gdax-l3" base quote) where
+instance Json.FromJSON (OrderBook "gdax-l2" base quote) where
    parseJSON val =
       let fromBook Book{..} = OrderBook
             <$> (BuySide <$> traverse parseOrder bids)
@@ -25,15 +25,15 @@ instance Json.FromJSON (OrderBook "gdax-l3" base quote) where
 
 data Book = Book
    { sequence :: Word            -- https://docs.gdax.com/#sequence-numbers
-   , bids :: Vector GDAXl3Order
-   , asks :: Vector GDAXl3Order
+   , bids :: Vector GDAXl2Order
+   , asks :: Vector GDAXl2Order
    } deriving (Eq, Show, Generic)
 
 instance Json.FromJSON Book
 
-type GDAXl3Order = (String,String,String)   -- Price, Quantity, Order_Id
+type GDAXl2Order = (String,String,Word)   -- Price, Quantity, Order_Count
 
-parseOrder :: GDAXl3Order -> Json.Parser (Order base quote)
+parseOrder :: GDAXl2Order -> Json.Parser (Order base quote)
 parseOrder (price,qty,_) = either fail return $ parseOrderStr price qty
 
 gdax :: SC.BaseUrl
@@ -45,18 +45,16 @@ type Api base quote
    :> "book"
    :> QueryParam "level" Word
    :> Header "User-Agent" Text
-   :> Get '[JSON] (OrderBook "gdax-l3" base quote)
+   :> Get '[JSON] (OrderBook "gdax-l2" base quote)
 
---instance DataSource (OrderBook "gdax-l3" "BTC" "USD") where
---   dataSrc = DataSrc gdax (clientM "BTC-USD" (Just 3) (Just userAgent))
+--instance DataSource (OrderBook "gdax-l2" "BTC" "USD") where
+--   dataSrc = DataSrc gdax (clientM "BTC-USD" (Just 2) (Just userAgent))
 --      where
 --         clientM = SC.client (Proxy :: Proxy (Api "BTC" "USD"))
 
---instance DataSource (OrderBook "gdax-l3" "BTC" "EUR") where
---   dataSrc = DataSrc gdax (clientM "BTC-EUR" (Just 3) (Just userAgent))
+--instance DataSource (OrderBook "gdax-l2" "BTC" "EUR") where
+--   dataSrc = DataSrc gdax (clientM "BTC-EUR" (Just 2) (Just userAgent))
 --      where
 --         clientM = SC.client (Proxy :: Proxy (Api "BTC" "EUR"))
 
--- TODO: Use custom user agent
-userAgent :: Text
-userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36"
+-- TODO

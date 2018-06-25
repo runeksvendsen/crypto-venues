@@ -1,12 +1,12 @@
-module Venues.Bitstamp
+module CryptoVenues.Venues.Bitstamp
 ()
 where
 
-import CPrelude
+import CryptoVenues.Internal.CPrelude
 import OrderBook
-import Fetch
-import Types.Market
-import Venues.Common.StringArrayOrder  (parseSomeOrderStr)
+import CryptoVenues.Fetch
+import CryptoVenues.Types.Market
+import CryptoVenues.Venues.Common.StringArrayOrder  (parseSomeOrderStr)
 
 import qualified Servant.Client        as SC
 import Servant.API

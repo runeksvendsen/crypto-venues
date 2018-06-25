@@ -1,8 +1,8 @@
 module CryptoVenues
-( module Venues
-, module Fetch
+( module CryptoVenues.Venues
+, module CryptoVenues.Fetch
 )
 where
 
-import Venues
-import Fetch
+import CryptoVenues.Venues
+import CryptoVenues.Fetch

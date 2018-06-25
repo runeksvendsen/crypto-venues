@@ -1,20 +1,20 @@
-module Venues
+module CryptoVenues.Venues
 ( allVenues
 , venueLookup
 , AnyVenue(..)
 )
 where
 
-import CPrelude
-import Fetch.MarketBook
+import CryptoVenues.Internal.CPrelude
+import CryptoVenues.Fetch.MarketBook
 
-import Venues.GDAXl2       as GDAXl2         ()
-import Venues.GDAXl3       as GDAXl3         ()
-import Venues.Bitstamp     as Bitstamp       ()
-import Venues.Bitfinex     as Bitfinex       ()
-import Venues.BitfinexV2   as BitfinexV2     ()
-import Venues.Bittrex      as Bittrex        ()
-import Venues.Binance      as Binance        ()
+import CryptoVenues.Venues.GDAXl2       as GDAXl2         ()
+import CryptoVenues.Venues.GDAXl3       as GDAXl3         ()
+import CryptoVenues.Venues.Bitstamp     as Bitstamp       ()
+import CryptoVenues.Venues.Bitfinex     as Bitfinex       ()
+import CryptoVenues.Venues.BitfinexV2   as BitfinexV2     ()
+import CryptoVenues.Venues.Bittrex      as Bittrex        ()
+import CryptoVenues.Venues.Binance      as Binance        ()
 
 import qualified Network.HTTP.Client   as HTTP
 import qualified Servant.Client        as SC

@@ -1,9 +1,9 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Types.AppM where
+module CryptoVenues.Types.AppM where
 
 import Prelude
 import Control.Monad.Reader
-import Types.Error as Error
+import CryptoVenues.Types.Error as Error
 import Control.Monad.Except
 import qualified Network.HTTP.Client      as HTTP
 import qualified Control.Monad.Parallel   as Par

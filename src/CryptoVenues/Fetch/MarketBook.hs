@@ -1,6 +1,6 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ExistentialQuantification #-}
-module Fetch.MarketBook
+module CryptoVenues.Fetch.MarketBook
 ( MarketBook(..)
 , AnyMarket(..)
 , DataSrc(..)
@@ -11,12 +11,12 @@ module Fetch.MarketBook
 )
 where
 
-import CPrelude
-import Fetch.DataSrc
-import Fetch.EnumMarkets
-import Types.RateLimit
+import CryptoVenues.Internal.CPrelude
+import CryptoVenues.Fetch.DataSrc
+import CryptoVenues.Fetch.EnumMarkets
+import CryptoVenues.Types.RateLimit
 import OrderBook.Types
-import Types.Market
+import CryptoVenues.Types.Market
 import qualified Servant.Client.Core.Reexport as S
 import qualified Servant.Client        as SC
 import           Servant.API

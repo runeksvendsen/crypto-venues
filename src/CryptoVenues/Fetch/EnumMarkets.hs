@@ -1,10 +1,10 @@
-module Fetch.EnumMarkets where
+module CryptoVenues.Fetch.EnumMarkets where
 
-import CPrelude
-import Fetch.DataSrc
-import Types.RateLimit
+import CryptoVenues.Internal.CPrelude
+import CryptoVenues.Fetch.DataSrc
+import CryptoVenues.Types.RateLimit
 import OrderBook.Types
-import Types.Market
+import CryptoVenues.Types.Market
 import qualified Servant.Client.Core.Reexport as S
 import qualified Servant.Client        as SC
 import           Servant.API

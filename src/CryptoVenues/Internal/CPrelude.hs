@@ -1,7 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module CPrelude
+module CryptoVenues.Internal.CPrelude
 ( module Protolude
--- , module Safe
+-- , module CryptoVenues.Safe
 , module Error
 , module TypeLits
 , module Prelude
@@ -23,8 +23,8 @@ where
 
 import Protolude hiding (trace, Show, show, error)
 import Prelude (String, Show, show, id, mod, lookup, error)
-import Types.Error as Error
-import Types.AppM as AppM
+import CryptoVenues.Types.Error as Error
+import CryptoVenues.Types.AppM as AppM
 import Debug.Trace (trace)
 -- import Safe hiding (atDef, atMay, foldl1May, foldr1May)
 import GHC.TypeLits as TypeLits (Symbol, KnownSymbol, SomeSymbol(..)

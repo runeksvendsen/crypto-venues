@@ -1,13 +1,13 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Venues.Bitfinex
+module CryptoVenues.Venues.Bitfinex
 ()
 where
 
-import CPrelude     hiding (asks)
+import CryptoVenues.Internal.CPrelude     hiding (asks)
 import OrderBook
-import Fetch
-import Types.Market
-import Venues.Common.StringArrayOrder  (parseSomeOrderStr)
+import CryptoVenues.Fetch
+import CryptoVenues.Types.Market
+import CryptoVenues.Venues.Common.StringArrayOrder  (parseSomeOrderStr)
 
 import qualified Servant.Client        as SC
 import Servant.API

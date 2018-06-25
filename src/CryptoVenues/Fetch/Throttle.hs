@@ -1,20 +1,20 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Fetch.Throttle
+module CryptoVenues.Fetch.Throttle
 ( fetchRateLimited )
 where
 
-import CPrelude
-import Types.Market
-import Fetch.MarketBook
-import Fetch.DataSrc
-import Fetch
-import Types.RateLimit
+import CryptoVenues.Internal.CPrelude
+import CryptoVenues.Types.Market
+import CryptoVenues.Fetch.MarketBook
+import CryptoVenues.Fetch.DataSrc
+import CryptoVenues.Fetch
+import CryptoVenues.Types.RateLimit
 import OrderBook.Types
 import Control.Monad
 import qualified Control.Retry      as Re
 import qualified Control.RateLimit  as Lim
 import qualified Data.Time.Units    as Time
-import qualified Log
+import qualified CryptoVenues.Internal.Log as Log
 
 
 -- | Initial waiting time for exponential backoff

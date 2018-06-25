@@ -1,6 +1,6 @@
 module Main where
 
-import CPrelude
+import CryptoVenues.Internal.CPrelude
 
 import qualified Spec.VenueFetch
 
@@ -10,7 +10,7 @@ import Test.Hspec             as HS
 import Test.Hspec.Runner
 import qualified Test.SmallCheck.Series as SS
 import qualified Network.HTTP.Client.TLS as HTTPS
-import qualified Log
+import qualified CryptoVenues.Internal.Log as
 
 
 scDepth = 4

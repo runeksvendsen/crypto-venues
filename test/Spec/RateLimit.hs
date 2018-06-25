@@ -1,12 +1,12 @@
-module Spec.RateLimit
+module CryptoVenues.Spec.RateLimit
 ( testRateLimitFetch, rateLimitFetch )
 where
 
-import CPrelude
+import CryptoVenues.Internal.CPrelude
 import qualified Fetch.Throttle as Throttle
 import qualified Venues
-import Types.Market
-import Fetch
+import CryptoVenues.Types.Market
+import CryptoVenues.Fetch
 import Test.Hspec
 import qualified Network.HTTP.Client   as HTTP
 import qualified Test.QuickCheck    as QC

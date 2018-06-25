@@ -1,4 +1,4 @@
-module Log
+module CryptoVenues.Internal.Log
 ( module Logging
 , infoS
 , info
@@ -6,7 +6,7 @@ module Log
 )
 where
 
-import CPrelude
+import CryptoVenues.Internal.CPrelude
 import Control.Logging as Logging
 --import qualified Control.Logging    as Log
 
