@@ -41,7 +41,6 @@ dependencies:
 - protolude
 - safe-money
 - orderbook
-- hash-graph
 - servant
 - servant-client
 - servant-server
