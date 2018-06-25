@@ -19,8 +19,8 @@ import qualified Data.Aeson.Types   as Json
 instance Json.FromJSON (OrderBook "gdax-l2" base quote) where
    parseJSON val =
       let fromBook Book{..} = OrderBook
-            <$> traverse parseOrder bids
-            <*> traverse parseOrder asks
+            <$> (BuySide <$> traverse parseOrder bids)
+            <*> (SellSide <$> traverse parseOrder asks)
       in Json.parseJSON val >>= fromBook
 
 data Book = Book

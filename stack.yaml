@@ -2,10 +2,11 @@ resolver: nightly-2018-06-02
 
 packages:
 - .
-- location:
-    git: https://github.com/runeksvendsen/orderbook.git
-    commit: 02593045e231f3eaf4de46b5c698e07bc4edbc07
-  extra-dep: true
+- ../orderbook
+# - location:
+#     git: https://github.com/runeksvendsen/orderbook.git
+#     commit: e1f8189ecbe39144bab6cb3e7a52ea65fafc95ce
+#   extra-dep: true
 # - location:
 #     git: https://github.com/patrickdoc/hash-graph.git
 #     commit: f18b143bfbbb936806c8d33bdcbc4d8970f11391

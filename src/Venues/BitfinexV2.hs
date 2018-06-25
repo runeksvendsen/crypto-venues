@@ -43,7 +43,7 @@ parseOrder (price,_,qty) = Order <$> mkQty qty <*> mkPrice price
 parseBook :: Book -> Json.Parser (OrderBook venue base quote)
 parseBook book = do
    orders <- traverse parseOrder book
-   return $ OrderBook (buyOrders orders) (sellOrders orders)
+   return $ OrderBook (BuySide $ buyOrders orders) (SellSide $ sellOrders orders)
    where
       buyOrders = Vec.filter ((> 0) . oQuantity)
       sellOrders = fmap fixSellQty . Vec.filter ((< 0) . oQuantity)
