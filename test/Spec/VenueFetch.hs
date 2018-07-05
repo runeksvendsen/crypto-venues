@@ -35,16 +35,6 @@ testMarketListLength =
    it ("we can fetch at least " ++ show minNumMarkets ++ " markets") $ \markets ->
       length markets `shouldSatisfy` (>= minNumMarkets)
 
---testFetchArbOrderbook
---   :: MarketBook venue
---   => HTTP.Manager
---   -> SpecWith (Arg ([Market venue] -> IO ()))
---testFetchArbOrderbook man =
---   it "we can fetch a randomly chosen market order book" $ \markets -> do
---      market <- QC.generate (QC.elements markets)
---      bookE <- runAppM man $ fetchMarketBook market
---      bookE `shouldSatisfy` isRight
-
 withMarketList
    :: forall venue a. EnumMarkets venue
    => HTTP.Manager
