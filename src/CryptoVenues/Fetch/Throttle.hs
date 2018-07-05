@@ -23,7 +23,7 @@ numMaxRetries = 5
 
 retryPolicy :: RateLimit venue -> Re.RetryPolicyM IO
 retryPolicy limit =
-   Re.exponentialBackoff backoffMicroSecs
+   Re.fullJitterBackoff backoffMicroSecs
    <> Re.limitRetries numMaxRetries
       where backoffMicroSecs = fromIntegral $ Time.toMicroseconds limit
 
