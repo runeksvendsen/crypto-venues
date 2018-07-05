@@ -17,19 +17,15 @@ import qualified Data.Time.Units    as Time
 import qualified CryptoVenues.Internal.Log as Log
 
 
--- | Initial waiting time for exponential backoff
-backoffStartWait :: Time.Second
-backoffStartWait = 1
-
 -- | Maximum number of retries
 numMaxRetries :: Int
 numMaxRetries = 5
 
-retryPolicy :: Re.RetryPolicyM IO
-retryPolicy =
+retryPolicy :: RateLimit venue -> Re.RetryPolicyM IO
+retryPolicy limit =
    Re.exponentialBackoff backoffMicroSecs
    <> Re.limitRetries numMaxRetries
-      where backoffMicroSecs = fromIntegral $ Time.toMicroseconds backoffStartWait
+      where backoffMicroSecs = fromIntegral $ Time.toMicroseconds limit
 
 -- | Fetch a number of order books as per the venue's rate limit,
 --    with built-in retrying in case of request failure (e.g. 'TooManyRequests')
@@ -39,8 +35,8 @@ fetchRateLimited
    => [Market venue]
    -> AppM IO [AnyBook venue]
 fetchRateLimited marketLst = do
-   limFetch <- mkRateLimited
-   handleErr $ foldrM (go limFetch) (Right []) marketLst
+   (limFetch, limit) <- mkRateLimited
+   handleErr $ foldrM (go limit limFetch) (Right []) marketLst
    where
       handleErr :: IO (Either Error a) -> AppM IO a
       handleErr ioa = throwLeft =<< liftIO ioa
@@ -48,16 +44,17 @@ fetchRateLimited marketLst = do
 -- | Fetch a single 'AnyBook' with rate-limiting enabled, and
 --  recover from failure as per 'retryPolicy'
 go :: KnownSymbol venue
-   => (Market venue -> IO (Either Error (AnyBook venue)))   -- ^ Rate-limited fetch function
+   => RateLimit venue
+   -> (Market venue -> IO (Either Error (AnyBook venue)))   -- ^ Rate-limited fetch function
    -> Market venue                                          -- ^ Which order book to fetch?
    -> Either Error [AnyBook venue]                          -- ^ Result of previous fetch (error or list of order books)
    -> IO (Either Error [AnyBook venue])
-go limFetch market (Right lst) =
-   Re.retrying retryPolicy doRetry $ \_ -> do
+go limit limFetch market (Right lst) =
+   Re.retrying (retryPolicy limit) doRetry $ \_ -> do
       resE <- Log.timedLogEnd (show' market <> " order book fetched.") $
          limFetch market
       return $ fmap (: lst) resE
-go _ _ left = return left
+go _ _ _ left = return left
 
 -- | Should we retry an error or not? (also logs)
 doRetry
@@ -79,7 +76,7 @@ doRetry Re.RetryStatus{..} (Left err) = do
 mkRateLimited
    :: forall venue.
       MarketBook venue
-   => AppM IO (Market venue -> IO (Either Error (AnyBook venue)))
+   => AppM IO (Market venue -> IO (Either Error (AnyBook venue)), RateLimit venue)
 mkRateLimited = do
    man <- asks cfgMan
    let venue = Proxy :: Proxy venue
@@ -90,7 +87,8 @@ mkRateLimited = do
    --  because otherwise new requests would be spawned
    --  while existing requests, that are paused while retrying,
    --  would be waiting to finish.
-   liftIO $ Lim.rateLimitExecution limit (runAppM man . fetchBook)
+   limFun <- liftIO $ Lim.rateLimitExecution limit (runAppM man . fetchBook)
+   return (limFun, limit)
    where
       dSrc :: DataSrc (RateLimit venue)
       dSrc = rateLimit
