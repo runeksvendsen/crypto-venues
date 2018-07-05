@@ -1,9 +1,9 @@
-module CryptoVenues.Spec.VenueFetch
+module Spec.VenueFetch
 ( spec )
 where
 
 import CryptoVenues.Internal.CPrelude
-import qualified Venues
+import qualified CryptoVenues.Venues as Venues
 import qualified Spec.RateLimit as RateLimit
 import CryptoVenues.Fetch
 
@@ -18,20 +18,20 @@ import qualified Test.QuickCheck    as QC
 minNumMarkets :: Int
 minNumMarkets = 5
 
-spec :: HTTP.Manager -> Spec
-spec man = parallel $
-   forM_ Venues.allVenues (testVenue man)
+spec :: HTTP.Manager -> Word -> Spec
+spec man maxRetries = parallel $
+   forM_ Venues.allVenues (testVenue man maxRetries)
 
-testVenue :: HTTP.Manager -> AnyVenue -> Spec
-testVenue man av@(AnyVenue venue) =
-   around (withMarketList man venue) $
+testVenue :: HTTP.Manager -> Word -> AnyVenue -> Spec
+testVenue man maxRetries av@(AnyVenue venue) =
+   around (withMarketList man maxRetries venue) $
       describe ("for " ++ show av) $
          parallel $ do
-            testMarketListLength man
-            RateLimit.testRateLimitFetch man
+            testMarketListLength
+            RateLimit.testRateLimitFetch man maxRetries
 
-testMarketListLength :: HTTP.Manager -> SpecWith (Arg ([Market venue] -> IO ()))
-testMarketListLength man =
+testMarketListLength :: SpecWith (Arg ([Market venue] -> IO ()))
+testMarketListLength =
    it ("we can fetch at least " ++ show minNumMarkets ++ " markets") $ \markets ->
       length markets `shouldSatisfy` (>= minNumMarkets)
 
@@ -48,11 +48,12 @@ testMarketListLength man =
 withMarketList
    :: forall venue a. EnumMarkets venue
    => HTTP.Manager
+   -> Word
    -> Proxy venue
    -> ([Market venue] -> IO a)
    -> IO a
-withMarketList man venue f = do
-   markets <- failOnErr =<< runAppM man (marketList venue)
+withMarketList man maxRetries venue f = do
+   markets <- failOnErr =<< runAppM man maxRetries (marketList venue)
    f markets
 
 failOnErr :: (Monad m, Show e) => Either e a -> m a

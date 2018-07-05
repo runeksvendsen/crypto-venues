@@ -15,8 +15,8 @@ throwLeft = either throwError return
 
 data Config
    = Config
-   { cfgMan    :: HTTP.Manager
-   -- , cfgLogLvl :: Log.LogLevel
+   { cfgMan         :: HTTP.Manager
+   , numMaxRetries  :: Word
    }
 
 newtype AppM m a = AppM { getAppM :: ReaderT Config (ExceptT Error m) a }
@@ -40,7 +40,6 @@ newtype AppM m a = AppM { getAppM :: ReaderT Config (ExceptT Error m) a }
 --           f' _   (Left e)  _         = return (Left e)
 --           f' _   _         (Left e)  = return (Left e)
 
-runAppM :: MonadIO m => HTTP.Manager -> AppM m a -> m (Either Error a)
-runAppM man appM = runExceptT $ runReaderT (getAppM appM) cfg
-   where cfg = Config man
-
+runAppM :: MonadIO m => HTTP.Manager -> Word -> AppM m a -> m (Either Error a)
+runAppM man numMaxRetries appM = runExceptT $ runReaderT (getAppM appM) cfg
+   where cfg = Config man numMaxRetries

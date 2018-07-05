@@ -14,6 +14,7 @@ import qualified Control.Monad.Parallel   as Par
 
 logLevel = Log.LevelDebug
 numMarkets = 30
+maxRetries = 6
 
 main = Log.withStderrLogging $ do
    Log.setLogLevel logLevel
@@ -29,7 +30,7 @@ forVenues man = Par.forM_ Venues.allVenues
 testVenue :: HTTP.Manager -> AnyVenue -> IO ()
 testVenue man av@(AnyVenue venue) =
    withMarketList man venue
-      (void . failOnErr <=< runAppM man . Throttle.fetchRateLimited . take numMarkets)
+      (void . failOnErr <=< runAppM man maxRetries . Throttle.fetchRateLimited . take numMarkets)
 
 withMarketList
    :: forall venue a. EnumMarkets venue
@@ -37,7 +38,7 @@ withMarketList
    -> Proxy venue
    -> ([Market venue] -> IO a) -> IO a
 withMarketList man venue f = do
-   markets <- failOnErr =<< runAppM man (marketList venue)
+   markets <- failOnErr =<< runAppM man maxRetries (marketList venue)
    f markets
 
 failOnErr :: (Monad m, Show e) => Either e a -> m a
