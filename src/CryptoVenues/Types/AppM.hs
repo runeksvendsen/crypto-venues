@@ -29,6 +29,9 @@ newtype AppM m a = AppM { getAppM :: ReaderT Config (ExceptT Error m) a }
    , Par.MonadParallel
    )
 
+instance MonadTrans AppM where
+    lift = AppM . lift . lift
+
 runAppM :: MonadIO m => HTTP.Manager -> Word -> AppM m a -> m (Either Error a)
 runAppM man numMaxRetries appM = runExceptT $ runReaderT (getAppM appM) cfg
    where cfg = Config man numMaxRetries
