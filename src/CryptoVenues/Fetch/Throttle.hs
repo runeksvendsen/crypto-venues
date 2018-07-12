@@ -49,8 +49,9 @@ go :: KnownSymbol venue
    -> IO (Either Error [AnyBook venue])
 go maxRetries limit limFetch market (Right lst) =
    Re.retrying (retryPolicy maxRetries limit) doRetry $ \_ -> do
-      resE <- Log.timedLogEnd (show' market <> " order book fetched.") $
-         limFetch market
+      resE <- limFetch market
+      when (isRight resE) $
+        Log.log $ show' market <> " order book fetched."
       return $ fmap (: lst) resE
 go _ _ _ _ left = return left
 
