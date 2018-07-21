@@ -11,6 +11,7 @@ module CryptoVenues.Types.Error
 where
 
 import Prelude
+import Formatting
 import Protolude.Conv (toS)
 import CryptoVenues.Types.Market
 import Data.Proxy
@@ -23,6 +24,7 @@ import Control.Exception
 import Servant.Client.Core
 import Servant.Client                        as SC
 import qualified Network.HTTP.Types.Status   as Status
+import qualified Data.Text as T
 
 
 data Error = forall venue. KnownSymbol venue =>
@@ -50,7 +52,7 @@ data FetchErr
    = TooManyRequests            -- ^ We should slow down
    | ConnectionErr String       -- ^ Something's wrong with the connection
    | EndpointErr BaseUrl        -- ^ The endpoint messed up
-   | InternalErr String         -- ^ We messed up
+   | InternalErr T.Text         -- ^ We messed up
       deriving (Show, Generic)  -- TODO: Proper Show instance
 
 -- instance Show FetchErr where
@@ -80,25 +82,35 @@ fromServant url (FailureResponse res) =
    handleStatusCode res url
 fromServant _ (ConnectionError errText) =
    ConnectionErr (show errText)
-fromServant _ (DecodeFailure decodeError _) =
-   InternalErr $ "Decode error: " ++ show decodeError
+fromServant _ (DecodeFailure decodeError res) =
+   InternalErr $ T.unwords
+              [ "Decode Error:"
+              , toS decodeError
+              , "Response body:"
+              , toS $ responseBody res
+              ]
 fromServant _ (UnsupportedContentType mediaType _) =
-   InternalErr $ "Unsupported content type: " ++ show mediaType
+   InternalErr . toS $ format ("Unsupported content type: " % string) (show mediaType)
 fromServant _ (InvalidContentTypeHeader res) =
-   InternalErr $ "Invalid content type header. Response: " ++ show res
+   InternalErr . toS $ format ("Invalid content type header. Response: " % string) (show res)
 
 handleStatusCode :: Response -> BaseUrl -> FetchErr
 handleStatusCode res url
     | statusCode == 429 = TooManyRequests
     | statusCode >= 500 && statusCode < 600 = EndpointErr url
-    | otherwise = InternalErr $
-        printf "Unhandled failure response. Code: %d. Msg: %s. Url: %s. Body:\n%s"
-               statusCode
-               (show (toS $ Status.statusMessage status :: String))
-               (show $ SC.showBaseUrl url)
-               (toS $ responseBody res :: String)
+    | otherwise = InternalErr failureResponseText
   where
     status = responseStatusCode res
     statusCode = Status.statusCode status
+    failureResponseText :: T.Text
+    failureResponseText = toS $
+        format ("Unhandled failure response. Code: " % int %
+                "Msg: " % text %
+                "Url: " % string %
+                "Body:\n" % text)
+            statusCode
+            (toS $ Status.statusMessage status)
+            (show $ SC.showBaseUrl url)
+            (toS $ responseBody res)
 
 
