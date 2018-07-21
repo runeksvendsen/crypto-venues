@@ -51,7 +51,7 @@ go maxRetries limit limFetch market (Right lst) =
    Re.retrying (retryPolicy maxRetries limit) doRetry $ \_ -> do
       resE <- limFetch market
       when (isRight resE) $
-        Log.log $ show' market <> " order book fetched."
+        Log.log $ show' market <> " order book fetched"
       return $ fmap (: lst) resE
 go _ _ _ _ left = return left
 
