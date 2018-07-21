@@ -81,9 +81,9 @@ instance MarketBook "binance" where
 instance Json.FromJSON (RateLimit "binance") where
    parseJSON val =
       let fromEI ExchangeInfo{..} =
-            headMay $ filter ((==) REQUESTS . rateLimitType) rateLimits
+            headMay $ filter ((==) REQUEST_WEIGHT . rateLimitType) rateLimits
       in Json.parseJSON val >>=
-            maybe (fail "rateLimitType 'REQUESTS' not found") (return . perSecond) . fromEI
+            maybe (fail "rateLimitType 'REQUEST_WEIGHT' not found") (return . perSecond) . fromEI
 
 
 instance Json.FromJSON (SomeBook "binance") where
@@ -116,7 +116,7 @@ perSecond BRateLimit{..}
 
 instance Json.FromJSON BRateLimit
 
-data LimitType = REQUESTS | ORDERS deriving (Eq, Generic)
+data LimitType = REQUEST_WEIGHT | ORDERS deriving (Eq, Generic)
 instance Json.FromJSON LimitType
 
 --instance Json.FromJSON LimitType where
