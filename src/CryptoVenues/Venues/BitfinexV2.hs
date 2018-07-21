@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module CryptoVenues.Venues.BitfinexV2
 ()
 where

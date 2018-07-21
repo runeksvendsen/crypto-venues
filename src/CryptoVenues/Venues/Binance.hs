@@ -1,4 +1,5 @@
 {-# LANGUAGE LambdaCase #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module CryptoVenues.Venues.Binance where
 
 import CryptoVenues.Internal.CPrelude
