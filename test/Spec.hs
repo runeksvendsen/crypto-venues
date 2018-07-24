@@ -13,10 +13,10 @@ import qualified CryptoVenues.Internal.Log as Log
 
 
 scDepth = 4
-maxRetries = 6
+maxRetries = 10
 
 main = Log.withStderrLogging $ do
-   Log.setLogLevel Log.LevelDebug
+   Log.setLogLevel Log.LevelError
    man <- HTTPS.newTlsManager
    let runHspec = hspecWith defaultConfig { configSmallCheckDepth = scDepth }
    runHspec $ Spec.VenueFetch.spec man maxRetries

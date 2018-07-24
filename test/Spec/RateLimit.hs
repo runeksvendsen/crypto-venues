@@ -12,7 +12,7 @@ import qualified Test.QuickCheck    as QC
 
 
 numOrderbooks :: Int
-numOrderbooks = 50
+numOrderbooks = 10
 
 testRateLimitFetch
    :: MarketBook venue

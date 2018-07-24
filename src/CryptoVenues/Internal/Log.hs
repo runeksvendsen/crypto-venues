@@ -8,7 +8,6 @@ where
 
 import CryptoVenues.Internal.CPrelude
 import Control.Logging as Logging
---import qualified Control.Logging    as Log
 
 
 infoS :: Text -> Text -> IO ()

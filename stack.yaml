@@ -2,20 +2,11 @@ resolver: lts-11.11
 
 packages:
 - .
-- ../orderbook
-# - location:
-#     git: https://github.com/runeksvendsen/orderbook.git
-#     commit: e1f8189ecbe39144bab6cb3e7a52ea65fafc95ce
-#   extra-dep: true
-# - location:
-#     git: https://github.com/patrickdoc/hash-graph.git
-#     commit: f18b143bfbbb936806c8d33bdcbc4d8970f11391
-#   extra-dep: true
+- location:
+    git: https://github.com/runeksvendsen/orderbook.git
+    commit: 5dfd8634e3c5fb2286d6bff34f0141e76c46f91c
+  extra-dep: true
 
-#- ../orderbook
-
-# Dependency packages to be pulled from upstream that are not in the resolver
-# (e.g., acme-missiles-0.3)
 extra-deps:
 - haskell-igraph-0.7.0
 - rate-limit-1.4.0
@@ -27,43 +18,8 @@ extra-deps:
 - cborg-0.2.0.0@sha256:4cc743e688046e0262c0d2ddcc786a4ebdd8b1e949c2055b4aef7eae5483eb90
 - half-0.2.2.3@sha256:52386a48e7fd42f4a1d49799073bb3d04477168c88b6541d5f66637d7c2e838c
 ### END safe-money deps
-
-### BEGIN rate-limit deps
-
-### END rate-limit deps
 - logging-3.0.5
-### BEGIN test deps
 
-### END test deps
-### BEGIN Paths.hs deps
-
-### END Paths.hs deps
-
-#flags:
-#  safe-money:
-#    xmlbf: false
-#    serialise: false
-
-# Override default flag values for local packages and extra-deps
 flags: {}
 
-# Extra package databases containing global packages
 extra-package-dbs: []
-
-# Control whether we use the GHC we find on the path
-# system-ghc: true
-#
-# Require a specific version of stack, using version ranges
-# require-stack-version: -any # Default
-# require-stack-version: ">=1.5"
-#
-# Override the architecture used by stack, especially useful on Windows
-# arch: i386
-# arch: x86_64
-#
-# Extra directories used by stack for building
-# extra-include-dirs: [/path/to/dir]
-# extra-lib-dirs: [/path/to/dir]
-#
-# Allow a newer minor version of GHC than the snapshot specifies
-# compiler-check: newer-minor
