@@ -6,7 +6,7 @@
 
 This library enables:
 
-1. Fetching the list of cryptocurrency markets offered by a given exchange/venue
+1. Fetching the list of available cryptocurrency markets for a given exchange/venue
 2. Fetching the order book for the given cryptocurrency market
 3. Throttling/rate-limiting requests, by using the specific exchange's rate-limit (and backing off if a "Too Many Requests"-HTTP error is received) 
 
