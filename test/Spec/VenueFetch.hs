@@ -8,10 +8,8 @@ import qualified Spec.RateLimit as RateLimit
 import CryptoVenues.Fetch
 
 import CryptoVenues.Types.Market
-import CryptoVenues.Fetch
 import Test.Hspec
 import qualified Network.HTTP.Client   as HTTP
-import qualified Test.QuickCheck    as QC
 
 
 -- | A sane lower bound on how many markets a venue must have
