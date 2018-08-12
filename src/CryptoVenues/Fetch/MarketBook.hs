@@ -59,7 +59,8 @@ fetchMarketBook
 fetchMarketBook market@Market{..} = do
    man <- asks cfgMan
    let handleErr = throwLeft . fmapL (Error (BookErr market))
-   ob <- handleErr =<< liftIO (srcFetch man (marketBook miApiSymbol))
+       proxy = Proxy :: Proxy venue
+   ob <- handleErr =<< liftIO (srcFetch man (marketBook miApiSymbol) (apiQuirk proxy))
    return $ bookFromMarket market ob
 
 -- | Convert a 'SomeBook' into an 'AnyBook' given a 'Market'

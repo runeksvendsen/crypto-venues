@@ -18,9 +18,14 @@ srcFetch
       MonadIO m
    => HTTP.Manager
    -> DataSrc dataType
+   -> (SC.ServantError -> m SC.ServantError)
    -> m (Either FetchErr dataType)
-srcFetch man ds = liftIO cmRes
-   where cmRes = fmapL (fromServant url) <$> SC.runClientM (dsClientM ds) env
-         env = SC.ClientEnv man url Nothing
-         url = dsUrl ds
-
+srcFetch man ds modifyErr = do
+    resE <- liftIO $ SC.runClientM (dsClientM ds) env
+    resModE <- case resE of
+        Left err  -> Left <$> modifyErr err
+        resR      -> return resR
+    return $ fmapL (fromServant url) resModE
+  where
+     env = SC.ClientEnv man url Nothing
+     url = dsUrl ds

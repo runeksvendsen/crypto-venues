@@ -80,7 +80,7 @@ mkRateLimited = do
    man <- asks cfgMan
    let venue = Proxy :: Proxy venue
        handleErr = throwLeft . fmapL (Error (VenueEnumErr venue))
-   limit :: RateLimit venue <- handleErr =<< srcFetch man dSrc
+   limit :: RateLimit venue <- handleErr =<< liftIO (srcFetch man dSrc (apiQuirk venue))
    liftIO $ Log.infoS (toS $ symbolVal venue) $ "Rate limit: " <> show' limit
    -- NB: Per-execution rate limit is important here,
    --  because otherwise new requests would be spawned

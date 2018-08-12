@@ -16,6 +16,10 @@ import qualified Data.Aeson.Types   as Json
 import qualified Data.Text as T
 import           Data.Vector  (Vector)
 import Control.Monad.Fail
+import qualified Network.HTTP.Types.Status   as Status
+import qualified Data.ByteString.Lazy.UTF8   as BS
+import Data.List                             (isInfixOf)
+import qualified CryptoVenues.Internal.Log   as Log
 {-# ANN module ("HLint: ignore Use camelCase"::String) #-}
 
 
@@ -29,6 +33,19 @@ instance EnumMarkets "bitstamp" where
    allMarkets = DataSrc apiUrl clientM
       where
          clientM = SC.client (Proxy :: Proxy ApiMarkets)
+   apiQuirk _ se@(SC.FailureResponse res)
+      | statusCode == 400 = SC.FailureResponse <$> handleIncapsulaErr
+      | otherwise = return se
+    where
+      handleIncapsulaErr =
+            let bodyStr = BS.toString (SC.responseBody res)
+            in if "iframe" `isInfixOf` bodyStr && "Incapsula_Resource" `isInfixOf` bodyStr
+                  then do
+                      Log.infoS "bitstamp" ("Applying quirk. Response:\n" <> toS (show res))
+                      return $ res { SC.responseStatusCode = Status.status429 }
+                  else return res
+      statusCode = Status.statusCode (SC.responseStatusCode res)
+   apiQuirk _ se = return se
 
 -- Base URL
 apiUrl = BaseUrl Https "www.bitstamp.net" 443 ""

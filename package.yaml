@@ -73,6 +73,7 @@ dependencies:
 - bimap
 - logging
 - formatting
+- utf8-string   # CryptoVenues.Venues.Bitstamp
 
 library:
   source-dirs: src
