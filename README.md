@@ -1,11 +1,13 @@
 # Cryptocurrency venues
 
+<img src="https://travis-ci.com/runeksvendsen/crypto-venues.svg?branch=master">
+
 ### Fetch order book data from various cryptocurrency exchanges. [Currently supported venues](https://github.com/runeksvendsen/crypto-venues/blob/dc093651d15a19d6d8185454bcf08c1284ab8bfa/src/Venues.hs#L28).
 
 This library enables:
 
-1. Fetching a list of supported cryptocurrency markets for a given exchange/venue
-2. Fetching an order book for a given cryptocurrency market
+1. Fetching the list of available cryptocurrency markets for a given exchange/venue
+2. Fetching the order book for the given cryptocurrency market
 3. Throttling/rate-limiting requests, by using the specific exchange's rate-limit (and backing off if a "Too Many Requests"-HTTP error is received) 
 
 The fetched order books are compatible with the [`orderbook`](https://github.com/runeksvendsen/orderbook) library, which we can then use to query the liquidity of the given market.
