@@ -2,7 +2,8 @@ module CryptoVenues.Fetch.Throttle
 ( fetchRateLimited )
 where
 
-import CryptoVenues.Internal.CPrelude
+import CryptoVenues.Internal.Prelude
+import CryptoVenues.Types.AppM.Internal
 import CryptoVenues.Types.Market
 import CryptoVenues.Fetch.MarketBook
 import OrderBook.Types
@@ -42,14 +43,13 @@ mkRateLimited
       MarketBook venue
    => AppM IO (Market venue -> IO (Either Error (AnyBook venue)))
 mkRateLimited = do
-   man <- asks cfgMan
    limit :: RateLimit venue <- getRateLimit
    -- NB: Per-execution rate limit is important here,
    --  because otherwise new requests would be spawned
    --  while existing requests, that are paused while retrying,
    --  would be waiting to finish.
-   maxRetries <- asks cfgNumMaxRetries
-   liftIO $ Lim.rateLimitExecution limit (runAppM man maxRetries . fetchBook)
+   cfg <- ask
+   liftIO $ Lim.rateLimitExecution limit (runAppM cfg . fetchBook)
    where
       fetchBook :: Market venue -> AppM IO (AnyBook venue)
       fetchBook = fetchMarketBook

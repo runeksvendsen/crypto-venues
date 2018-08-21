@@ -31,7 +31,7 @@ timeout = Clock.fromNanoSecs (1e9 * 3600 * 24)
 create :: MonadIO m => m RateLimitCache
 create = do
     res <- liftIO $ Cache.newCache (Just timeout)
-    liftIO $ Log.debugS "RateLimitCache" "Created new rate cache"
+    liftIO $ Log.debugS "RateLimitCache" "Created new cache"
     return res
 
 insert :: forall m venue.

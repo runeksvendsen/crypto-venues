@@ -1,6 +1,7 @@
 module CryptoVenues.Fetch.EnumMarkets where
 
-import CryptoVenues.Internal.CPrelude
+import CryptoVenues.Internal.Prelude
+import CryptoVenues.Types.AppM.Internal
 import CryptoVenues.Fetch.DataSrc
 import CryptoVenues.Types.RateLimit
 import OrderBook.Types

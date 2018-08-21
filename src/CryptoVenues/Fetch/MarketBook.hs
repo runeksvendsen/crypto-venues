@@ -12,7 +12,8 @@ module CryptoVenues.Fetch.MarketBook
 )
 where
 
-import CryptoVenues.Internal.CPrelude
+import CryptoVenues.Internal.Prelude
+import CryptoVenues.Types.AppM.Internal
 import CryptoVenues.Fetch.DataSrc
 import CryptoVenues.Fetch.EnumMarkets
 import CryptoVenues.Types.RateLimit
