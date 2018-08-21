@@ -68,6 +68,8 @@ dependencies:
 - retry
 - rate-limit
 - time-units
+- cache
+- clock
 # Paths.hs
 - fgl
 - bimap

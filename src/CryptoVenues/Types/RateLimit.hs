@@ -3,9 +3,12 @@ module CryptoVenues.Types.RateLimit
 ( RateLimit )
 where
 
-import CryptoVenues.Internal.CPrelude
-import qualified Control.Concurrent    as C
-import qualified Data.Time.Units    as Time
+import Prelude
+import GHC.TypeLits                       (Symbol)
+import Text.Printf                        (printf)
+import Data.Ratio                         (numerator, denominator)
+import qualified Control.Concurrent       as C
+import qualified Data.Time.Units          as Time
 
 
 instance Time.TimeUnit (RateLimit venue) where

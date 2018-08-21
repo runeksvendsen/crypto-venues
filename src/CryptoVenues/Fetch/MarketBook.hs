@@ -6,6 +6,7 @@ module CryptoVenues.Fetch.MarketBook
 , DataSrc(..)
 , RateLimit
 , fetchMarketBook
+, getRateLimit
 , AnyVenue(..)
 , marketListAny
 )
@@ -23,6 +24,10 @@ import           Servant.API
 import qualified Data.Aeson            as Json
 import qualified Network.HTTP.Client   as HTTP
 import Data.Hashable
+import qualified Control.Retry                              as Re
+import qualified CryptoVenues.Internal.Log                  as Log
+import qualified Data.Time.Units                            as Time
+import qualified CryptoVenues.Internal.RateLimitCache       as Cache
 
 
 -- | Order book fetching
@@ -51,6 +56,24 @@ instance Hashable AnyMarket where
    hashWithSalt salt (AnyMarket mkt) =
       hashWithSalt salt [miBase mkt, miQuote mkt]
 
+getRateLimit
+      :: forall m venue.
+         (MonadIO m, MarketBook venue)
+      => AppM m (Cache.RateLimit venue)
+getRateLimit = do
+    rlCache <- asks cfgRateLimitCache
+    maybe (fetchStore rlCache) return =<< Cache.lookup rlCache
+  where
+    fetchStore :: MonadIO m => Cache.RateLimitCache -> AppM m (Cache.RateLimit venue)
+    fetchStore cache = do
+        man <- asks cfgMan
+        let venue = Proxy :: Proxy venue
+            handleErr = throwLeft . fmapL (Error (VenueEnumErr venue))
+        limit <- handleErr =<< liftIO (srcFetch man rateLimit (apiQuirk venue))
+        liftIO $ Log.infoS (toS $ symbolVal venue) $ "Rate limit: " <> show' limit
+        Cache.insert cache limit
+        return limit
+
 fetchMarketBook
    :: forall venue.
       MarketBook venue
@@ -58,10 +81,35 @@ fetchMarketBook
    -> AppM IO (AnyBook venue)
 fetchMarketBook market@Market{..} = do
    man <- asks cfgMan
-   let handleErr = throwLeft . fmapL (Error (BookErr market))
+   maxRetries <- asks cfgNumMaxRetries
+   limit :: RateLimit venue <- getRateLimit
+   let handleErr = fmapL (Error (BookErr market))
        proxy = Proxy :: Proxy venue
-   ob <- handleErr =<< liftIO (srcFetch man (marketBook miApiSymbol) (apiQuirk proxy))
+   resE <- Re.retrying (retryPolicy maxRetries limit) doRetry $ \_ ->
+      handleErr <$> liftIO (srcFetch man (marketBook miApiSymbol) (apiQuirk proxy))
+   ob <- throwLeft resE
+   liftIO $ Log.infoS (toS $ symbolVal proxy) $ show' market <> " order book fetched"
    return $ bookFromMarket market ob
+
+-- | Should we retry an error or not? (also logs)
+doRetry
+   :: Re.RetryStatus
+   -> Either Error a
+   -> AppM IO Bool
+doRetry _                  (Right _)  = return False
+doRetry Re.RetryStatus{..} (Left err) = do
+   let retrying = shouldRetry err
+       retryStr = if retrying then "Retrying " else "Not retrying "
+       attempt  = " (attempt " <> show' rsIterNumber <> ")"
+       logFun = if retrying then Log.warnS else Log.lerrorS
+   liftIO $ logFun ("Fetch" <> attempt) $ retryStr <> "failed request: " <> show' err
+   return retrying
+
+retryPolicy :: Word -> RateLimit venue -> Re.RetryPolicyM (AppM IO)
+retryPolicy numMaxRetries limit =
+   Re.fullJitterBackoff backoffMicroSecs
+   <> Re.limitRetries (fromIntegral numMaxRetries)
+      where backoffMicroSecs = fromIntegral $ Time.toMicroseconds limit
 
 -- | Convert a 'SomeBook' into an 'AnyBook' given a 'Market'
 bookFromMarket
