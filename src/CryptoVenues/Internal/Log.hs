@@ -6,7 +6,7 @@ module CryptoVenues.Internal.Log
 )
 where
 
-import CryptoVenues.Internal.CPrelude
+import Protolude
 import Control.Logging as Logging
 
 

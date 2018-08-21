@@ -16,6 +16,7 @@ import CryptoVenues.Types.RateLimit
 
 import qualified Data.Cache         as Cache
 import qualified System.Clock       as Clock
+import qualified CryptoVenues.Internal.Log                  as Log
 
 
 data SomeRateLimit
@@ -28,15 +29,21 @@ timeout :: Clock.TimeSpec
 timeout = Clock.fromNanoSecs (1e9 * 3600 * 24)
 
 create :: MonadIO m => m RateLimitCache
-create = liftIO $ Cache.newCache (Just timeout)
+create = do
+    res <- liftIO $ Cache.newCache (Just timeout)
+    liftIO $ Log.debugS "RateLimitCache" "Created new rate cache"
+    return res
 
 insert :: forall m venue.
           (MonadIO m, KnownSymbol venue)
        => RateLimitCache
        -> RateLimit venue
        -> m ()
-insert cache rl = liftIO $
-    Cache.insert cache (toS $ symbolVal (Proxy :: Proxy venue)) (SomeRateLimit rl)
+insert cache rl = liftIO $ do
+    let key = symbolVal (Proxy :: Proxy venue)
+    Cache.insert cache (toS key) (SomeRateLimit rl)
+    Log.debugS (toS $ "RateLimitCache (" ++ key ++ ")")
+        "Inserted rate limit"
 
 lookup :: forall m venue.
           (MonadIO m, KnownSymbol venue)
@@ -44,6 +51,9 @@ lookup :: forall m venue.
        -> m (Maybe (RateLimit venue))
 lookup cache = do
     someRlM <- liftIO $ Cache.lookup cache (toS key)
+    let logCtx = toS $ "RateLimitCache (" ++ key ++ ")"
+        logStr = maybe "not found" (const "found") someRlM
+    liftIO $ Log.debugS logCtx (toS $ "Lookup: " ++ logStr)
     return $ handleSomeRL <$> someRlM
   where
     key = symbolVal (Proxy :: Proxy venue)

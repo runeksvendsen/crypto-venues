@@ -70,7 +70,7 @@ getRateLimit = do
         let venue = Proxy :: Proxy venue
             handleErr = throwLeft . fmapL (Error (VenueEnumErr venue))
         limit <- handleErr =<< liftIO (srcFetch man rateLimit (apiQuirk venue))
-        liftIO $ Log.infoS (toS $ symbolVal venue) $ "Rate limit: " <> show' limit
+        liftIO $ Log.infoS (toS $ symbolVal venue) $ "Fetched rate limit: " <> show' limit
         Cache.insert cache limit
         return limit
 
