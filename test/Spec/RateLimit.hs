@@ -3,7 +3,6 @@ module Spec.RateLimit
 where
 
 import CryptoVenues.Internal.CPrelude
-import qualified CryptoVenues.Fetch.Throttle as Throttle
 import CryptoVenues.Types.Market
 import CryptoVenues.Fetch
 import Test.Hspec
@@ -32,7 +31,7 @@ rateLimitFetch
 rateLimitFetch man maxRetries markets = do
    someMarkets <- QC.generate (QC.shuffle markets)
    let marketLst = take numOrderbooks someMarkets
-   bookLstE <- runAppM man maxRetries $ Throttle.fetchRateLimited marketLst
+   bookLstE <- runAppM man maxRetries $ mapM fetchMarketBook marketLst
    bookLstE `shouldSatisfy` isRight
    let Just bookLst = rightToMaybe bookLstE
    return $ rnf bookLst

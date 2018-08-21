@@ -29,6 +29,7 @@ import qualified Control.Retry                              as Re
 import qualified CryptoVenues.Internal.Log                  as Log
 import qualified Data.Time.Units                            as Time
 import qualified CryptoVenues.Internal.RateLimitCache       as Cache
+import qualified Control.RateLimit                          as Lim
 
 
 -- | Order book fetching
@@ -80,7 +81,18 @@ fetchMarketBook
       MarketBook venue
    => Market venue
    -> AppM IO (AnyBook venue)
-fetchMarketBook market@Market{..} = do
+fetchMarketBook market = do
+    cfg <- ask
+    limit :: RateLimit venue <- getRateLimit
+    fetchRL <- liftIO $ Lim.rateLimitExecution limit (runAppM cfg . fetchMarketBook')
+    throwLeft =<< liftIO (fetchRL market)
+
+fetchMarketBook'
+   :: forall venue.
+      MarketBook venue
+   => Market venue
+   -> AppM IO (AnyBook venue)
+fetchMarketBook' market@Market{..} = do
    man <- asks cfgMan
    maxRetries <- asks cfgNumMaxRetries
    limit :: RateLimit venue <- getRateLimit
