@@ -4,6 +4,7 @@ import CryptoVenues.Internal.Prelude
 import CryptoVenues.Types.AppM.Internal
 import CryptoVenues.Fetch.DataSrc
 import CryptoVenues.Types.RateLimit
+import qualified CryptoVenues.Internal.Log    as Log
 import OrderBook.Types
 import CryptoVenues.Types.Market
 import qualified Servant.Client.Core.Reexport as S
@@ -31,4 +32,11 @@ marketList p = do
    man <- asks cfgMan
    let handleErr = throwLeft . fmapL (Error (VenueEnumErr p))
    res :: MarketList venue <- handleErr =<< liftIO (srcFetch man allMarkets (apiQuirk p))
+   logMarketListFetch res
    return $ getMarkets res
+  where
+   logMarketListFetch = lift . Log.log' . toS . mkLogMessage
+   mkLogMessage :: MarketList venue -> String
+   mkLogMessage (MarketList markets) =
+      printf "%s: Fetched %d markets" venueName (length markets)
+   venueName = symbolVal (Proxy :: Proxy venue)
