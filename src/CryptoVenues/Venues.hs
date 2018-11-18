@@ -8,8 +8,7 @@ where
 import CryptoVenues.Internal.CPrelude
 import CryptoVenues.Fetch.MarketBook
 
-import CryptoVenues.Venues.GDAXl2       as GDAXl2         ()
-import CryptoVenues.Venues.GDAXl3       as GDAXl3         ()
+import CryptoVenues.Venues.Coinbase     as Coinbase       ()
 import CryptoVenues.Venues.Bitstamp     as Bitstamp       ()
 import CryptoVenues.Venues.Bitfinex     as Bitfinex       ()
 import CryptoVenues.Venues.BitfinexV2   as BitfinexV2     ()
@@ -28,6 +27,7 @@ allVenues =
    , AnyVenue (Proxy :: Proxy "bittrex")
    , AnyVenue (Proxy :: Proxy "binance")
    , AnyVenue (Proxy :: Proxy "bitstamp")
+   , AnyVenue (Proxy :: Proxy "coinbase")
    ]
 
 -- | Map of all supported venue names to its corresponding 'AnyVenue'
