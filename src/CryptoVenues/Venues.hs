@@ -15,8 +15,6 @@ import CryptoVenues.Venues.BitfinexV2   as BitfinexV2     ()
 import CryptoVenues.Venues.Bittrex      as Bittrex        ()
 import CryptoVenues.Venues.Binance      as Binance        ()
 
-import qualified Network.HTTP.Client   as HTTP
-import qualified Servant.Client        as SC
 import qualified Data.HashMap.Strict   as HM
 
 
