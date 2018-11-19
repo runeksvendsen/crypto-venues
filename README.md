@@ -2,7 +2,7 @@
 
 <img src="https://travis-ci.com/runeksvendsen/crypto-venues.svg?branch=master">
 
-### Fetch order book data from various cryptocurrency exchanges. [Currently supported venues](https://github.com/runeksvendsen/crypto-venues/blob/dc093651d15a19d6d8185454bcf08c1284ab8bfa/src/Venues.hs#L28).
+### Fetch order book data from various cryptocurrency exchanges. [Currently supported venues](https://github.com/runeksvendsen/crypto-venues/blob/master/src/CryptoVenues/Venues.hs#L24).
 
 This library enables:
 
