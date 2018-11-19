@@ -15,6 +15,7 @@ import Servant.API
 import qualified Data.Aeson   as Json
 import qualified Data.Aeson.Types   as Json
 import           Data.Vector  (Vector)
+import qualified Data.Vector  as Vec
 import qualified Data.Text as T
 
 
@@ -33,7 +34,8 @@ instance MarketBook "bitfinex" where
 instance Json.FromJSON (SomeBook "bitfinex") where
    parseJSON val =
       let fromBook Book{..} = mkSomeBook
-            <$> traverse parseOrder bids
+                                    -- HACK: ignore zero-price buy orders from Bitfinex
+            <$> traverse parseOrder (Vec.filter nonZeroPrice bids)
             <*> traverse parseOrder asks
       in Json.parseJSON val >>= fromBook >>= either fail return
 
@@ -47,6 +49,9 @@ data BitfinexOrder = BitfinexOrder
    , amount    :: QuotedScientific
    , timestamp :: String
    } deriving (Eq, Show, Generic)
+
+nonZeroPrice :: BitfinexOrder -> Bool
+nonZeroPrice BitfinexOrder{..} = price /= 0
 
 instance Json.FromJSON Book
 instance Json.FromJSON BitfinexOrder
