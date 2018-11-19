@@ -6,7 +6,7 @@ import CryptoVenues.Internal.CPrelude
 import OrderBook
 import CryptoVenues.Fetch
 import CryptoVenues.Types.Market
-import CryptoVenues.Venues.Common.StringArrayOrder  (parseSomeOrderStr)
+import CryptoVenues.Venues.Common.ScientificOrder
 
 import qualified Servant.Client        as SC
 import Servant.API
@@ -61,9 +61,11 @@ type ApiDepth
    :> Get '[JSON] (SomeBook "binance")
 
 data Book = Book
-   { bids   :: Vector (Text,Text,[Text])
-   , asks   :: Vector (Text,Text,[Text])
+   { bids   :: Vector BOrder
+   , asks   :: Vector BOrder
    } deriving Generic
+
+type BOrder = (QuotedScientific,QuotedScientific,[Text])
 
 instance Json.FromJSON Book
 
@@ -90,8 +92,8 @@ instance Json.FromJSON (SomeBook "binance") where
             <*> traverse parseOrder asks
       in Json.parseJSON val >>= fromBook >>= either fail return
 
-parseOrder :: (Text,Text,[Text]) -> Json.Parser SomeOrder
-parseOrder (price,amount,_) = either fail return $ parseSomeOrderStr (toS price) (toS amount)
+parseOrder :: BOrder -> Json.Parser SomeOrder
+parseOrder (price,amount,_) = either fail return $ parseSomeOrderSci price amount
 
 -- Rate limit stuff
 type ApiRateLimit

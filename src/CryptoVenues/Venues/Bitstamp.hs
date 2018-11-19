@@ -8,7 +8,7 @@ import CryptoVenues.Internal.CPrelude
 import OrderBook
 import CryptoVenues.Fetch
 import CryptoVenues.Types.Market
-import CryptoVenues.Venues.Common.StringArrayOrder  (parseSomeOrderStr)
+import CryptoVenues.Venues.Common.ScientificOrder
 
 import qualified Servant.Client        as SC
 import Servant.API
@@ -70,10 +70,10 @@ data Book = Book
    } deriving (Eq, Show, Generic)
 instance Json.FromJSON Book
 
-type BitstampOrder = (String,String)   -- Price, Quantity
+type BitstampOrder = (QuotedScientific,QuotedScientific)   -- Price, Quantity
 
 parseOrder :: BitstampOrder -> Json.Parser SomeOrder
-parseOrder (price,qty) = either fail return $ parseSomeOrderStr price qty
+parseOrder (price,qty) = either fail return $ parseSomeOrderSci price qty
 
 instance Json.FromJSON (SomeBook "bitstamp") where
    parseJSON val =

@@ -8,7 +8,7 @@ import CryptoVenues.Internal.CPrelude     hiding (asks)
 import OrderBook
 import CryptoVenues.Fetch
 import CryptoVenues.Types.Market
-import CryptoVenues.Venues.Common.StringArrayOrder  (parseSomeOrderStr)
+import CryptoVenues.Venues.Common.ScientificOrder
 
 import qualified Servant.Client        as SC
 import Servant.API
@@ -43,8 +43,8 @@ data Book = Book
    } deriving (Eq, Show, Generic)
 
 data BitfinexOrder = BitfinexOrder
-   { price     :: String
-   , amount    :: String
+   { price     :: QuotedScientific
+   , amount    :: QuotedScientific
    , timestamp :: String
    } deriving (Eq, Show, Generic)
 
@@ -52,7 +52,7 @@ instance Json.FromJSON Book
 instance Json.FromJSON BitfinexOrder
 
 parseOrder :: BitfinexOrder -> Json.Parser SomeOrder
-parseOrder BitfinexOrder{..} = either fail return $ parseSomeOrderStr price amount
+parseOrder BitfinexOrder{..} = either fail return $ parseSomeOrderSci price amount
 
 apiUrl :: BaseUrl
 apiUrl = BaseUrl Https "api.bitfinex.com" 443 ""
