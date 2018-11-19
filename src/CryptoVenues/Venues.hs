@@ -11,7 +11,6 @@ import CryptoVenues.Fetch.MarketBook
 import CryptoVenues.Venues.Coinbase     as Coinbase       ()
 import CryptoVenues.Venues.Bitstamp     as Bitstamp       ()
 import CryptoVenues.Venues.Bitfinex     as Bitfinex       ()
-import CryptoVenues.Venues.BitfinexV2   as BitfinexV2     ()
 import CryptoVenues.Venues.Bittrex      as Bittrex        ()
 import CryptoVenues.Venues.Binance      as Binance        ()
 
