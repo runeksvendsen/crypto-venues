@@ -1,15 +1,8 @@
---{-# LANGUAGE ExistentialQuantification #-}
 module CryptoVenues.Types.Market where
 
 import Prelude
 import Protolude
---import CryptoVenues.Fetch.DataSrc
-import OrderBook.Types
 import Text.Printf
-import qualified Servant.Client        as SC
-import           Servant.API
-import qualified Data.Aeson            as Json
-import qualified Network.HTTP.Client   as HTTP
 
 
 data Market (venue :: Symbol) = Market

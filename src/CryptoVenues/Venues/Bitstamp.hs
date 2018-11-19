@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 module CryptoVenues.Venues.Bitstamp
 ()
 where
@@ -15,7 +16,6 @@ import qualified Data.Aeson   as Json
 import qualified Data.Aeson.Types   as Json
 import qualified Data.Text as T
 import           Data.Vector  (Vector)
-import Control.Monad.Fail
 import qualified Network.HTTP.Types.Status   as Status
 import qualified Data.ByteString.Lazy.UTF8   as BS
 import Data.List                             (isInfixOf)
@@ -26,7 +26,7 @@ import qualified CryptoVenues.Internal.Log   as Log
 instance MarketBook "bitstamp" where
    marketBook apiSymbol = DataSrc apiUrl (cm apiSymbol (Just userAgent))
       where cm = SC.client (Proxy :: Proxy ApiOb)
-   rateLimit = DataSrc apiUrl (return . fromRational . toRational $ 1)
+   rateLimit = DataSrc apiUrl (return 1)
    -- Rate limit: 600 requests per 10 minutes (https://www.bitstamp.net/api/)
 
 instance EnumMarkets "bitstamp" where
@@ -47,7 +47,7 @@ instance EnumMarkets "bitstamp" where
       statusCode = Status.statusCode (SC.responseStatusCode res)
    apiQuirk _ se = return se
 
--- Base URL
+apiUrl :: BaseUrl
 apiUrl = BaseUrl Https "www.bitstamp.net" 443 ""
 
 userAgent :: Text

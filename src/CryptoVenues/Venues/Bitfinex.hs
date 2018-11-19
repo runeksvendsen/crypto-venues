@@ -14,9 +14,7 @@ import qualified Servant.Client        as SC
 import Servant.API
 import qualified Data.Aeson   as Json
 import qualified Data.Aeson.Types   as Json
---import qualified Data.Aeson.Parser as Json
 import           Data.Vector  (Vector)
-import Control.Monad.Fail
 import qualified Data.Text as T
 
 
@@ -29,7 +27,7 @@ instance MarketBook "bitfinex" where
    marketBook apiSymbol = DataSrc apiUrl cm
       where cm = clientM apiSymbol (Just 1000) (Just 1000)
             clientM = SC.client (Proxy :: Proxy (Api base quote))
-   rateLimit = DataSrc apiUrl (return . fromRational . toRational $ 1)
+   rateLimit = DataSrc apiUrl (return 1)
 -- Orderbook rate limit: Ratelimit: 60 req/min (https://docs.bitfinex.com/v1/reference#rest-public-orderbook)
 
 instance Json.FromJSON (SomeBook "bitfinex") where

@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 {-
    https://bittrex.com/home/api
 -}
@@ -7,7 +8,6 @@ module CryptoVenues.Venues.Bittrex
 where
 
 import CryptoVenues.Internal.CPrelude
-import Prelude (getChar)
 import OrderBook
 import CryptoVenues.Fetch
 import CryptoVenues.Types.Market
@@ -18,9 +18,7 @@ import Servant.API
 import qualified Data.Aeson   as Json
 import qualified Data.Aeson.Types   as Json
 import           Data.Vector  (Vector)
-import Control.Monad.Fail
 import qualified Data.Char as Char
-import qualified Money
 
 
 instance Json.FromJSON (SomeBook "bittrex") where
@@ -61,7 +59,7 @@ parseOrder bo@BittrexOrder{..} =
    maybe (fail $ "Bad BittrexOrder: " ++ show bo) return soM
    where soM = mkSomeOrder (toRational quantity) (toRational rate)
 
-
+apiUrl :: BaseUrl
 apiUrl = BaseUrl Https "bittrex.com" 443 ""
 
 -- | Example: https://bittrex.com/api/v1.1/public/getorderbook?market=BTC-ADA&type=both
@@ -101,7 +99,7 @@ type ApiMarkets
 
 instance MarketBook "bittrex" where
    marketBook = mkBookSrc
-   rateLimit = DataSrc apiUrl (return . fromRational . toRational $ 1)
+   rateLimit = DataSrc apiUrl (return 1)
    -- Rate limit: 1 per second (https://bitcoin.stackexchange.com/questions/59316/trading-bot-what-is-the-maximum-load-an-exchange-server-can-take)
 
 instance EnumMarkets "bittrex" where

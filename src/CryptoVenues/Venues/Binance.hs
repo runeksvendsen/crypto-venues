@@ -1,5 +1,5 @@
-{-# LANGUAGE LambdaCase #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 module CryptoVenues.Venues.Binance where
 
 import CryptoVenues.Internal.CPrelude
@@ -13,9 +13,6 @@ import Servant.API
 import qualified Data.Aeson   as Json
 import qualified Data.Aeson.Types   as Json
 import           Data.Vector  (Vector)
-import Control.Monad.Fail
-import qualified Data.Text as T
-import qualified Data.Vector  as Vec
 
 
 apiUrl :: BaseUrl
@@ -109,31 +106,14 @@ data BRateLimit = BRateLimit
    } deriving Generic
 
 perSecond :: BRateLimit -> RateLimit "binance"
-perSecond BRateLimit{..}
-   | interval == SECOND = fromRational $ toRational limit
-   | interval == MINUTE = fromRational (fromIntegral limit % 60)
-   | interval == DAY    = fromRational (fromIntegral limit % 3600*24)
+perSecond (BRateLimit _ SECOND limit) = fromRational $ toRational limit
+perSecond (BRateLimit _ MINUTE limit) = fromRational (fromIntegral limit % 60)
+perSecond (BRateLimit _ DAY    limit) = fromRational (fromIntegral limit % 3600*24)
 
 instance Json.FromJSON BRateLimit
 
 data LimitType = REQUEST_WEIGHT | ORDERS deriving (Eq, Generic)
 instance Json.FromJSON LimitType
 
---instance Json.FromJSON LimitType where
---   parseJSON = Json.withText "LimitType" $ \case
---         "REQUESTS"  -> return REQUESTS
---         "ORDERS"    -> return ORDERS
---         txt         -> fail $ "Unknown 'rateLimitType': " ++ toS txt
-
 data LimitInterval = SECOND | MINUTE | DAY deriving (Eq, Generic)
 instance Json.FromJSON LimitInterval
-
---instance Json.FromJSON LimitInterval where
---   parseJSON = Json.withText "LimitInterval" $ \case
---         "SECOND" -> return SECOND
---         "MINUTE" -> return MINUTE
---         "DAY"    -> return DAY
---         txt      -> fail $ "Unknown 'interval': " ++ toS txt
-
-
-

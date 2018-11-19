@@ -19,12 +19,7 @@ import CryptoVenues.Fetch.EnumMarkets
 import CryptoVenues.Types.RateLimit
 import OrderBook.Types
 import CryptoVenues.Types.Market
-import qualified Servant.Client.Core.Reexport as S
-import qualified Servant.Client        as SC
-import           Servant.API
 import qualified Data.Aeson            as Json
-import qualified Network.HTTP.Client   as HTTP
-import Data.Hashable
 import qualified Control.Retry                              as Re
 import qualified CryptoVenues.Internal.Log                  as Log
 import qualified Data.Time.Units                            as Time

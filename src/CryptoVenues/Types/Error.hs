@@ -15,11 +15,9 @@ import Formatting
 import Protolude.Conv (toS)
 import CryptoVenues.Types.Market
 import Data.Proxy
-import Control.DeepSeq
 import GHC.Generics
 import GHC.TypeLits
 import Text.Printf
-import Control.Exception
 -- import Servant.Common.Req
 import Servant.Client.Core
 import Servant.Client                        as SC

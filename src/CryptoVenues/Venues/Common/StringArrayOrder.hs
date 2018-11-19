@@ -4,8 +4,6 @@ import CryptoVenues.Internal.CPrelude
 import OrderBook.Types
 import qualified Money
 import qualified Data.Scientific as Sci
-import Control.Monad.Fail
-import qualified Data.Aeson.Types   as Json
 
 type PriceStr = String
 type QtyStr = String

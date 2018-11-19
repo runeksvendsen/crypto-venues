@@ -7,7 +7,6 @@ import Prelude
 import GHC.TypeLits                       (Symbol)
 import Text.Printf                        (printf)
 import Data.Ratio                         (numerator, denominator)
-import qualified Control.Concurrent       as C
 import qualified Data.Time.Units          as Time
 
 
@@ -24,7 +23,3 @@ instance Show (RateLimit venue) where
       (numerator rateLimit)
       (denominator rateLimit)
       (realToFrac rateLimit :: Double)
-
-delay :: RateLimit venue -> IO ()
-delay (RateLimit rat) = C.threadDelay
-   (round $ rat * 1e6) -- Delay for a number of microseconds
