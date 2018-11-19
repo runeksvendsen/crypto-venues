@@ -3,6 +3,7 @@ module CryptoVenues.Types.AppM.Internal
 ( AppM
 , Config(..)
 , runAppM
+, evalAppM
 , throwLeft
 )
 where
@@ -43,3 +44,9 @@ instance MonadTrans AppM where
 runAppM :: MonadIO m => Config -> AppM m a -> m (Either Error a)
 runAppM cfg appM =
     runExceptT $ runReaderT (getAppM appM) cfg
+
+-- | Evaluate an 'AppM' action inside 'AppM'.
+evalAppM :: MonadIO m => AppM m a -> AppM m (Either Error a)
+evalAppM appM = do
+   cfg <- ask
+   lift $ runAppM cfg appM
