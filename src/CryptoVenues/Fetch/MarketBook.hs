@@ -149,5 +149,5 @@ marketListAny
    :: MonadIO m
    => AnyVenue
    -> AppM m [AnyMarket]
-marketListAny (AnyVenue p) =
-   map AnyMarket <$> marketList p
+marketListAny (AnyVenue (_ :: Proxy venue)) =
+   map (AnyMarket :: Market venue -> AnyMarket) <$> marketList

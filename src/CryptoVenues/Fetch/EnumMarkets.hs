@@ -20,11 +20,11 @@ class KnownSymbol venue => EnumMarkets venue where
 marketList
    :: forall venue m.
       (EnumMarkets venue, MonadIO m)
-   => Proxy venue
-   -> AppM m [Market venue]
-marketList p = do
+   => AppM m [Market venue]
+marketList = do
    man <- asks cfgMan
    let handleErr = throwLeft . fmapL (Error (VenueEnumErr p))
+       p = Proxy :: Proxy venue
    res :: MarketList venue <- handleErr =<< liftIO (srcFetch man allMarkets (apiQuirk p))
    logMarketListFetch res
    return $ getMarkets res

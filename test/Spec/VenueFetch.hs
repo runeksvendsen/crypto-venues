@@ -21,8 +21,8 @@ spec man maxRetries = parallel $
    forM_ Venues.allVenues (testVenue man maxRetries)
 
 testVenue :: HTTP.Manager -> Word -> AnyVenue -> Spec
-testVenue man maxRetries av@(AnyVenue venue) =
-   around (withMarketList man maxRetries venue) $
+testVenue man maxRetries av@(AnyVenue (_ :: Proxy venue)) =
+   around (withMarketList man maxRetries :: ([Market venue] -> IO a) -> IO a) $
       describe ("for " ++ show av) $
          parallel $ do
             testMarketListLength
@@ -37,11 +37,10 @@ withMarketList
    :: forall venue a. EnumMarkets venue
    => HTTP.Manager
    -> Word
-   -> Proxy venue
    -> ([Market venue] -> IO a)
    -> IO a
-withMarketList man maxRetries venue f = do
-   markets <- failOnErr =<< runAppM man maxRetries (marketList venue)
+withMarketList man maxRetries f = do
+   markets <- failOnErr =<< runAppM man maxRetries marketList
    f markets
 
 failOnErr :: (Monad m, Show e) => Either e a -> m a
