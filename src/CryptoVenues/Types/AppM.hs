@@ -4,6 +4,7 @@ module CryptoVenues.Types.AppM
 , runAppM
 , Internal.throwLeft
 , Internal.evalAppM
+, Error
 )
 where
 
