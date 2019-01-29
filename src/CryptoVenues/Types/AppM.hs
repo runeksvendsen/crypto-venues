@@ -3,6 +3,7 @@ module CryptoVenues.Types.AppM
 , Internal.Config
 , runAppM
 , Internal.throwLeft
+, Internal.evalAppM
 )
 where
 
