@@ -4,14 +4,13 @@ module CryptoVenues.Types.ABook where
 
 import Prelude
 import CryptoVenues.Internal.Prelude
-import CryptoVenues.Fetch.MarketBook
 import OrderBook.Types
--- LOL
+
 import qualified CryptoVenues.Venues            ()
 import           CryptoVenues.Fetch.MarketBook  (MarketBook)
 import qualified OrderBook.Types                as OB
 
-import qualified Money
+
 import qualified Data.Aeson                     as Json
 import           Data.Aeson                     ((.=), (.:))
 import           Data.Proxy                     (Proxy(..))
@@ -67,8 +66,6 @@ abVenue
 abVenue _ =
     toS $ symbolVal (Proxy :: Proxy venue) :: Text
 
-
--- TODO: Move below to "orderbook" library
 instance Json.ToJSON ABook where
     toJSON (ABook ob) = case ob of
         (_ :: OB.OrderBook venue base quote) -> Json.object
@@ -106,3 +103,6 @@ marketBookVenue "binance"  = Just . MarketBookVenue $ Proxy @"binance"
 marketBookVenue "bitstamp" = Just . MarketBookVenue $ Proxy @"bitstamp"
 marketBookVenue "coinbase" = Just . MarketBookVenue $ Proxy @"coinbase"
 marketBookVenue _          = Nothing
+
+toABook :: MarketBook venue => AnyBook venue -> ABook
+toABook (AnyBook ob) = ABook ob
