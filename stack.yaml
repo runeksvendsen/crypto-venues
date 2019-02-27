@@ -2,12 +2,10 @@ resolver: lts-11.11
 
 packages:
 - .
-# TMP
-- /Users/runesvendsen/code/orderbook
-# - location:
-#     git: https://github.com/runeksvendsen/orderbook.git
-#     commit: 5dfd8634e3c5fb2286d6bff34f0141e76c46f91c
-#   extra-dep: true
+- location:
+    git: https://github.com/runeksvendsen/orderbook.git
+    commit: 1cfe64aeb59ddebcfb0b8353f82457d16766fa36
+  extra-dep: true
 
 extra-deps:
 - haskell-igraph-0.7.0
