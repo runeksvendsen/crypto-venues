@@ -36,51 +36,50 @@ default-extensions:
 - DeriveFunctor
 - TypeOperators
 
-dependencies:
-- base            >= 4.7    && < 5
-- protolude
-- safe-money
-- orderbook
-- servant
-- servant-client
-- servant-client-core
-- servant-server
-- servant-docs
-- aeson
-- vector
-- bytestring
-- scientific
-- json-schema
-- pretty-show
-- text
-- safe
-- http-client
-- http-client-tls
-- errors
-# Venues
-- http-types
-- mtl
-- unordered-containers
-- transformers
-- monad-parallel
-- hashable
-- deepseq   #TEST
-- retry
-- rate-limit
-- time-units
-- cache
-- clock
-# Paths.hs
-- fgl
-- bimap
-- logging
-- formatting
-- utf8-string   # CryptoVenues.Venues.Bitstamp
-
 library:
   source-dirs: src
   ghc-options:
   - -Wall
+  dependencies:
+  - base            >= 4.7    && < 5
+  - protolude
+  - safe-money
+  - orderbook
+  - servant
+  - servant-client
+  - servant-client-core
+  - servant-server
+  - servant-docs
+  - aeson
+  - vector
+  - bytestring
+  - scientific
+  - json-schema
+  - pretty-show
+  - text
+  - safe
+  - http-client
+  - http-client-tls
+  - errors
+  # Venues
+  - http-types
+  - mtl
+  - unordered-containers
+  - transformers
+  - monad-parallel
+  - hashable
+  - deepseq   #TEST
+  - retry
+  - rate-limit
+  - time-units
+  - cache
+  - clock
+  # Paths.hs
+  - fgl
+  - bimap
+  - logging
+  - formatting
+  - utf8-string   # CryptoVenues.Venues.Bitstamp
 
 tests:
   crypto-venues-test:
@@ -91,7 +90,10 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
+    - base            >= 4.7    && < 5
     - crypto-venues
+    - http-client
+    - http-client-tls
     - QuickCheck
     - hspec
     - HUnit
@@ -101,3 +103,20 @@ tests:
     - smallcheck
     - hspec-smallcheck
     - hspec-expectations-pretty-diff
+
+executables:
+  write-test-data:
+    main:                WriteTestData.hs
+    source-dirs:         app/
+    ghc-options:
+    - -Wall
+    - -fno-warn-name-shadowing
+    dependencies:
+    - base            >= 4.7    && < 5
+    - crypto-venues
+    - aeson
+    - http-client
+    - http-client-tls
+    - logging
+    - optparse-applicative
+    - errors
