@@ -65,7 +65,7 @@ data Book = Book
    , asks   :: Vector BOrder
    } deriving Generic
 
-type BOrder = (QuotedScientific,QuotedScientific,[Text])
+type BOrder = (QuotedScientific,QuotedScientific)
 
 instance Json.FromJSON Book
 
@@ -93,7 +93,7 @@ instance Json.FromJSON (SomeBook "binance") where
       in Json.parseJSON val >>= fromBook >>= either fail return
 
 parseOrder :: BOrder -> Json.Parser SomeOrder
-parseOrder (price,amount,_) = either fail return $ parseSomeOrderSci price amount
+parseOrder (price,amount) = either fail return $ parseSomeOrderSci price amount
 
 -- Rate limit stuff
 type ApiRateLimit
