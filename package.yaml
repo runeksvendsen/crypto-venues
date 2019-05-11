@@ -120,3 +120,4 @@ executables:
     - logging
     - optparse-applicative
     - errors
+    - text

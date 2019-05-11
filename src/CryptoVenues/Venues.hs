@@ -1,5 +1,6 @@
 module CryptoVenues.Venues
 ( allVenues
+, allVenuesText
 , venueLookup
 , AnyVenue(..)
 )
@@ -17,7 +18,7 @@ import CryptoVenues.Venues.Binance      as Binance        ()
 import qualified Data.HashMap.Strict   as HM
 
 
--- | Canonical list of all supported venues
+-- | Canonical list of all supported venues ('AnyVenue')
 allVenues :: [AnyVenue]
 allVenues =
    [ AnyVenue (Proxy :: Proxy "bitfinex")
@@ -26,6 +27,10 @@ allVenues =
    , AnyVenue (Proxy :: Proxy "bitstamp")
    , AnyVenue (Proxy :: Proxy "coinbase")
    ]
+
+-- | Canonical list of all supported venues ('Text')
+allVenuesText :: [Text]
+allVenuesText = map fst $ HM.toList venueMap
 
 -- | Map of all supported venue names to its corresponding 'AnyVenue'
 venueMap :: HM.HashMap Text AnyVenue
