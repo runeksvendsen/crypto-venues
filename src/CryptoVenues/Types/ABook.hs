@@ -3,6 +3,7 @@
 module CryptoVenues.Types.ABook where
 
 import Prelude
+import Protolude
 import CryptoVenues.Internal.Prelude
 import OrderBook.Types
 
@@ -29,6 +30,9 @@ data ABook =
 instance Show ABook where
     show (ABook ob) =
         toS $ abBase ob <> "/" <> abQuote ob <> " (" <> abVenue ob <> ")"
+
+instance NFData ABook where
+    rnf (ABook ob) = rnf ob
 
 instance Eq ABook where
     (ABook ob1) == (ABook ob2) =
