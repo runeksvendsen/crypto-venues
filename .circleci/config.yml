@@ -1,0 +1,29 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: fpco/stack-build:lts-12
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore cache
+          keys:
+            - v3-{{ checksum "package.yaml" }}-{{ checksum "stack.yaml" }}
+      - run:
+          name: Install GHC
+          command: stack setup
+      - run:
+          name: Build library
+          command: stack build
+      - run:
+          name: Build tests
+          command: stack test --no-run-tests
+      - save_cache:
+          name: Save cache
+          key: v3-{{ checksum "package.yaml" }}-{{ checksum "stack.yaml" }}
+          paths:
+            - /root/.stack
+            - /root/project/.stack-work
+      - run:
+          name: Run tests
+          command: stack test
