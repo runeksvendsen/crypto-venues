@@ -74,7 +74,7 @@ data Book = Book
 
 instance Json.FromJSON Book
 
-type CoinbaseOrder = (QuotedScientific,QuotedScientific,Word)   -- Price, Quantity, Order_Count
+type CoinbaseOrder = (QuotedScientific,QuotedScientific,Text)   -- Price, Quantity, Order_Count
 
 parseOrder :: CoinbaseOrder -> Json.Parser SomeOrder
 parseOrder (price,qty,_) = either fail return $ parseSomeOrderSci price qty
