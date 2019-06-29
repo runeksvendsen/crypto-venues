@@ -1,6 +1,7 @@
 # Cryptocurrency venues
 
 Travis CI: [<img src="https://travis-ci.com/runeksvendsen/crypto-venues.svg?branch=master">](https://travis-ci.com/runeksvendsen/crypto-venues)
+
 CircleCI: [![CircleCI](https://circleci.com/gh/runeksvendsen/crypto-venues.svg?style=svg)](https://circleci.com/gh/runeksvendsen/crypto-venues)
 
 ### Fetch order book data from various cryptocurrency exchanges. [Currently supported venues](https://github.com/runeksvendsen/crypto-venues/blob/master/src/CryptoVenues/Venues.hs#L24).
