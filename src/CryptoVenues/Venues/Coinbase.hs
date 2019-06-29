@@ -23,7 +23,7 @@ instance EnumMarkets "coinbase" where
 
 instance MarketBook "coinbase" where
    marketBook apiSymbol = DataSrc endpoint_url cm
-      where cm = clientM apiSymbol (Just 2) (Just userAgent)
+      where cm = clientM apiSymbol (Just 3) (Just userAgent)
             clientM = SC.client (Proxy :: Proxy ApiOb)
    rateLimit = DataSrc endpoint_url (return 3)
 -- Orderbook rate limit: 3 req/sec (https://docs.pro.coinbase.com/#rate-limits)
