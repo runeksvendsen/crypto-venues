@@ -79,13 +79,31 @@ type ApiMarkets
 instance Json.FromJSON (MarketList "bitfinex") where
    parseJSON val = MarketList <$> Json.parseJSON val
 
+-- | Bitfinex "(trading) pair code" string format (deduced through trial and error):
+-- Either (in descending priority):
+--  a) exactly six charaters in length:
+--       * first three characters comprise base currency
+--       * following three characters comprise quote currency
+--  b) containing exactly one colon (':') character:
+--       * base/quote currency separated by colon (':') character
+fromPairCode
+   :: T.Text
+   -> Maybe (Market "bitfinex")
+fromPairCode str
+   | T.length str == 6 =
+      mkMarket (T.toUpper $ T.take 3 str) (T.toUpper $ T.takeEnd 3 str)
+   | [baseSymbol, quoteSymbol] <- T.split (== ':') str =
+      mkMarket baseSymbol quoteSymbol
+   | otherwise = Nothing
+  where
+   mkMarket base quote =
+      Just $ Market
+            { miBase       = base
+            , miQuote      = quote
+            , miApiSymbol  = str
+            }
+
 instance Json.FromJSON (Market "bitfinex") where
    parseJSON = Json.withText "Bitfinex market" $ \currPair ->
-         if T.length currPair /= 6
-            then fail $ "Invalid symbol: " ++ toS currPair
-            else return Market
-                  { miBase       = T.toUpper $ T.take 3 currPair
-                  , miQuote      = T.toUpper $ T.takeEnd 3 currPair
-                  , miApiSymbol  = currPair
-                  }
-
+         let errorStr = "Invalid trading pair code: " ++ toS currPair
+         in maybe (fail errorStr) return (fromPairCode currPair)
