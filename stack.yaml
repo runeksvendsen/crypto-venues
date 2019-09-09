@@ -8,7 +8,6 @@ packages:
   extra-dep: true
 
 extra-deps:
-- haskell-igraph-0.7.0
 - rate-limit-1.4.0
 - time-units-1.0.0
 - safe-money-0.6
