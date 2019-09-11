@@ -1,4 +1,4 @@
-resolver: lts-12.14
+resolver: lts-14.0
 
 packages:
 - .
@@ -8,16 +8,9 @@ packages:
   extra-dep: true
 
 extra-deps:
-- rate-limit-1.4.0
-- time-units-1.0.0
-- safe-money-0.6
-### BEGIN safe-money deps
-- serialise-0.2.0.0@sha256:377bc9a3f2be921496db65d6d1d9be6f8903c9d868a39dffd4831f5c61154964
-- xmlbf-0.4.1@sha256:c0a7e38f611e4090e05debe22fee75e68aa97d59178b3098de3ca7751bf66709
-- cborg-0.2.0.0@sha256:4cc743e688046e0262c0d2ddcc786a4ebdd8b1e949c2055b4aef7eae5483eb90
-- half-0.2.2.3@sha256:52386a48e7fd42f4a1d49799073bb3d04477168c88b6541d5f66637d7c2e838c
-### END safe-money deps
-- logging-3.0.5
+- logging-3.0.5@sha256:88096d3124fce9a19af3720f751e1a354d866ed5030d2e5197238d2277cdb2f2
+- rate-limit-1.4.1@sha256:27abe882e8b7851202cac124ea2b631e77ab7216f7a655b0782704838fe3c305
+- time-units-1.0.0@sha256:27cf54091c4a0ca73d504fc11d5c31ab4041d17404fe3499945e2055697746c1
 
 flags: {}
 

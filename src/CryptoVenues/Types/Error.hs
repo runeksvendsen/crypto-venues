@@ -75,8 +75,8 @@ shouldRetryFE :: FetchErr -> Bool
 shouldRetryFE (InternalErr _) = False
 shouldRetryFE _ = True
 
-fromServant :: BaseUrl -> ServantError -> FetchErr
-fromServant url (FailureResponse res) =
+fromServant :: BaseUrl -> ClientError -> FetchErr
+fromServant url (FailureResponse _ res) =
    handleStatusCode res url
 fromServant _ (ConnectionError errText) =
    ConnectionErr (show errText)
@@ -110,5 +110,3 @@ handleStatusCode res url
             (toS $ Status.statusMessage status)
             (show $ SC.showBaseUrl url)
             (toS $ responseBody res)
-
-

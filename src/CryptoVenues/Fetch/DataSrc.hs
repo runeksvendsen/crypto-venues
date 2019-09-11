@@ -16,7 +16,7 @@ srcFetch
       MonadIO m
    => HTTP.Manager
    -> DataSrc dataType
-   -> (SC.ServantError -> m SC.ServantError)
+   -> (SC.ClientError -> m SC.ClientError)
    -> m (Either FetchErr dataType)
 srcFetch man ds modifyErr = do
     resE <- liftIO $ SC.runClientM (dsClientM ds) env

@@ -33,8 +33,8 @@ instance EnumMarkets "bitstamp" where
    allMarkets = DataSrc apiUrl clientM
       where
          clientM = SC.client (Proxy :: Proxy ApiMarkets)
-   apiQuirk _ se@(SC.FailureResponse res)
-      | statusCode == 400 = SC.FailureResponse <$> handleIncapsulaErr
+   apiQuirk _ se@(SC.FailureResponse req res)
+      | statusCode == 400 = SC.FailureResponse req <$> handleIncapsulaErr
       | otherwise = return se
     where
       handleIncapsulaErr =
@@ -114,6 +114,3 @@ instance Json.FromJSON (Market "bitstamp") where
                   , miApiSymbol  = url_symbol
                   }
             _            -> fail . toS $ "Bad market name: " <> name
-
-
-

@@ -12,8 +12,8 @@ import qualified Servant.Client        as SC
 class KnownSymbol venue => EnumMarkets venue where
    allMarkets :: DataSrc (MarketList venue)  -- ^
    apiQuirk   :: Proxy venue
-              -> SC.ServantError
-              -> IO SC.ServantError          -- ^ Circumvent API quirk by modifying error response
+              -> SC.ClientError
+              -> IO SC.ClientError           -- ^ Circumvent API quirk by modifying error response
                                              --    before the error is handled generically
    apiQuirk _ = return
 

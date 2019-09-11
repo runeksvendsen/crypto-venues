@@ -54,7 +54,6 @@ library:
   - vector
   - bytestring
   - scientific
-  - json-schema
   - pretty-show
   - text
   - safe
