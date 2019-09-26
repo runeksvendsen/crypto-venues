@@ -90,10 +90,9 @@ fetchMarketBook'
 fetchMarketBook' market@Market{..} = do
    man <- asks cfgMan
    maxRetries <- asks cfgNumMaxRetries
-   limit :: RateLimit venue <- getRateLimit
    let handleErr = fmapL (Error (BookErr market))
        proxy = Proxy :: Proxy venue
-   resE <- Re.retrying (retryPolicy maxRetries limit) doRetry $ \_ ->
+   resE <- Re.retrying (retryPolicy maxRetries) doRetry $ \_ ->
       handleErr <$> liftIO (srcFetch man (marketBook miApiSymbol) (apiQuirk proxy))
    ob <- throwLeft resE
    liftIO $ Log.infoS (toS $ symbolVal proxy) $ show' market <> " order book fetched"
@@ -113,11 +112,11 @@ doRetry Re.RetryStatus{..} (Left err) = do
    liftIO $ logFun ("Fetch" <> attempt) $ retryStr <> "failed request: " <> show' err
    return retrying
 
-retryPolicy :: Word -> RateLimit venue -> Re.RetryPolicyM (AppM IO)
-retryPolicy numMaxRetries limit =
+retryPolicy :: Word -> Re.RetryPolicyM (AppM IO)
+retryPolicy numMaxRetries =
    Re.fullJitterBackoff backoffMicroSecs
    <> Re.limitRetries (fromIntegral numMaxRetries)
-      where backoffMicroSecs = fromIntegral $ Time.toMicroseconds limit
+      where backoffMicroSecs = fromIntegral $ Time.toMicroseconds (1 :: Time.Second)
 
 -- | Convert a 'SomeBook' into an 'AnyBook' given a 'Market'
 bookFromMarket
