@@ -92,7 +92,7 @@ fetchMarketBook' market@Market{..} = do
    maxRetries <- asks cfgNumMaxRetries
    let handleErr = fmapL (Error (BookErr market))
        proxy = Proxy :: Proxy venue
-   resE <- Re.retrying (retryPolicy maxRetries) doRetry $ \_ ->
+   resE <- Re.retryingDynamic (retryPolicy maxRetries) doRetry $ \_ ->
       handleErr <$> liftIO (srcFetch man (marketBook miApiSymbol) (apiQuirk proxy))
    ob <- throwLeft resE
    liftIO $ Log.infoS (toS $ symbolVal proxy) $ show' market <> " order book fetched"
@@ -102,15 +102,16 @@ fetchMarketBook' market@Market{..} = do
 doRetry
    :: Re.RetryStatus
    -> Either Error a
-   -> AppM IO Bool
-doRetry _                  (Right _)  = return False
+   -> AppM IO Re.RetryAction
+doRetry _                  (Right _)  = return Re.DontRetry
 doRetry Re.RetryStatus{..} (Left err) = do
-   let retrying = shouldRetry err
+   let retryAction = toRetryAction err
+       retrying = retryAction /= Re.DontRetry
        retryStr = if retrying then "Retrying " else "Not retrying "
        attempt  = " (attempt " <> show' rsIterNumber <> ")"
        logFun = if retrying then Log.warnS else Log.lerrorS
    liftIO $ logFun ("Fetch" <> attempt) $ retryStr <> "failed request: " <> show' err
-   return retrying
+   return retryAction
 
 retryPolicy :: Word -> Re.RetryPolicyM (AppM IO)
 retryPolicy numMaxRetries =

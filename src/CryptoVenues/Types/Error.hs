@@ -1,11 +1,12 @@
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE NumDecimals #-}
 module CryptoVenues.Types.Error
 ( Error(..)
 , ErrType(..)
 , FetchErr(..)
 , VenueFetchErr(..)
 , IsError(..)
-, shouldRetry
+, toRetryAction
 , fromServant
 )
 where
@@ -18,11 +19,18 @@ import Data.Proxy
 import GHC.Generics
 import GHC.TypeLits
 import Text.Printf
--- import Servant.Common.Req
+import Data.Maybe                            (listToMaybe)
+import Data.Foldable                         (toList)
+import Text.Read                             (readMaybe)
+import Control.Monad                         ((<=<))
 import Servant.Client.Core
 import Servant.Client                        as SC
 import qualified Network.HTTP.Types.Status   as Status
 import qualified Data.Text as T
+import qualified Data.Time.Units             as Time
+import qualified Data.Sequence               as Seq
+import qualified Network.HTTP.Types.Header   as Header
+import qualified Control.Retry               as Re
 
 
 data Error = forall venue. KnownSymbol venue =>
@@ -47,11 +55,12 @@ instance KnownSymbol venue => Show (ErrType venue) where
 
 -- |
 data FetchErr
-   = TooManyRequests            -- ^ We should slow down
+   = TooManyRequests (Maybe Time.Second)  -- ^ We should slow down
+                                          --  (Maybe the time we should wait before next request)
    | ConnectionErr String       -- ^ Something's wrong with the connection
    | EndpointErr BaseUrl        -- ^ The endpoint messed up
    | InternalErr T.Text         -- ^ We messed up
-      deriving (Show, Generic)  -- TODO: Proper Show instance
+      deriving (Eq, Show, Generic)  -- TODO: Proper Show instance
 
 -- instance Show FetchErr where
 --     show (EndpointErr url) = "EndpointErr: " ++ show (showBaseUrl url)
@@ -67,13 +76,19 @@ class IsError err info where
 instance KnownSymbol venue => IsError VenueFetchErr (Proxy venue) where
    fromFetchErr = VenueFetchErr
 
-shouldRetry :: Error -> Bool
-shouldRetry Error{..} = shouldRetryFE eFetchErr
+toRetryAction :: Error -> Re.RetryAction
+toRetryAction Error{..} =
+   toRetryActionFE eFetchErr
 
--- | Should we retry a failed request?
-shouldRetryFE :: FetchErr -> Bool
-shouldRetryFE (InternalErr _) = False
-shouldRetryFE _ = True
+toRetryActionFE :: FetchErr -> Re.RetryAction
+toRetryActionFE (InternalErr _)   = Re.DontRetry
+toRetryActionFE (EndpointErr _)   = Re.ConsultPolicy
+toRetryActionFE (ConnectionErr _) = Re.ConsultPolicy
+toRetryActionFE (TooManyRequests timeM) =
+   maybe Re.ConsultPolicy overrideDelay timeM
+  where
+   overrideDelay :: Time.TimeUnit t => t -> Re.RetryAction
+   overrideDelay = Re.ConsultPolicyOverrideDelay . fromIntegral . Time.toMicroseconds
 
 fromServant :: BaseUrl -> ClientError -> FetchErr
 fromServant url (FailureResponse _ res) =
@@ -94,7 +109,10 @@ fromServant _ (InvalidContentTypeHeader res) =
 
 handleStatusCode :: Response -> BaseUrl -> FetchErr
 handleStatusCode res url
-    | statusCode == 429 = TooManyRequests
+    | statusCode == 429 ||
+      -- "binance" returns 418 when the client has been banned.
+      -- interpret this as "TooManyRequests"
+      statusCode == 418 = TooManyRequests (headerRetryAfter res)
     | statusCode >= 500 && statusCode < 600 = EndpointErr url
     | otherwise = InternalErr failureResponseText
   where
@@ -110,3 +128,16 @@ handleStatusCode res url
             (toS $ Status.statusMessage status)
             (show $ SC.showBaseUrl url)
             (toS $ responseBody res)
+
+-- Get the number of seconds to wait before retrying from
+--  a "Retry-After" header, if present. Assumed to contain
+--  waiting time in seconds.
+headerRetryAfter
+   :: Response
+   -> Maybe Time.Second
+headerRetryAfter res =
+    fmap fromSeconds . readMaybe <=< fmap toS . listToMaybe . map snd . toList $
+        Seq.filter ((== Header.hRetryAfter) . fst) (responseHeaders res)
+  where
+    fromSeconds :: Integer -> Time.Second
+    fromSeconds = Time.fromMicroseconds . (* 1e6)
