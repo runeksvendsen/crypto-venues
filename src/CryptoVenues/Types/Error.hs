@@ -31,7 +31,7 @@ import qualified Data.Time.Units             as Time
 import qualified Data.Sequence               as Seq
 import qualified Network.HTTP.Types.Header   as Header
 import qualified Control.Retry               as Re
-
+import Debug.Trace
 
 data Error = forall venue. KnownSymbol venue =>
    Error
@@ -92,7 +92,7 @@ toRetryActionFE (TooManyRequests timeM) =
 
 fromServant :: BaseUrl -> ClientError -> FetchErr
 fromServant url (FailureResponse _ res) =
-   handleStatusCode res url
+   show res `trace` handleStatusCode res url
 fromServant _ (ConnectionError errText) =
    ConnectionErr (show errText)
 fromServant _ (DecodeFailure decodeError res) =
