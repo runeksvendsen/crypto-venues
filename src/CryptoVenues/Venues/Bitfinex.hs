@@ -1,6 +1,50 @@
+{-|
+Module      : CryptoVenues.Venues.Bitfinex
+Description : Bitfinex implementation for 'EnumMarkets' and functions to implement 'MarketBook'
+
+The Bitfinex order book API has two modes, and it's necessary to choose one.
+
+/Raw/ mode returns raw orders from the order book, so that it's possible to distinguish between
+multiple orders of the same price and quantity. This mode has 100% price precision,
+but only returns a small part of the order book (since Bitfinex doesn't
+allow fetching more than 100 orders from an order book).
+
+/Aggregation/ mode aggregates multiple almost-same-priced orders into a single order.
+This mode thus loses price precision but enables fetching a larger part of the order book.
+
+__Raw mode:__
+
+* Advantage: 100% price precision.
+* Disadvantage: only tiny part of order book for large order books (e.g. ~0.01% price range for ETH/BTC)
+
+__Aggregation mode:__
+
+* Advantage: larger part of order book, even for large order books (e.g. ~5% price range for ETH/BTC)
+* Disadvantage: less than 100% precision (seemingly 99.9% precision)
+
+Since there are multiple useful implementations for 'MarketBook' you'll have to implement it
+yourself.
+
+To choose "raw mode":
+
+> instance MarketBook "bitfinex" where
+>    marketBook = marketBook_Raw
+>    rateLimit = marketBook_rateLimit
+
+To choose "aggregation mode":
+
+> instance MarketBook "bitfinex" where
+>    marketBook = marketBook_Agg
+>    rateLimit = marketBook_rateLimit
+
+-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module CryptoVenues.Venues.Bitfinex
-()
+( marketBook_rateLimit
+, marketBook_Raw
+, marketBook_Agg
+, OB.SomeBook
+)
 where
 
 import CryptoVenues.Internal.CPrelude     hiding (asks)
@@ -39,16 +83,42 @@ instance EnumMarkets "bitfinex" where
       where
          clientM = SC.client (Proxy :: Proxy ApiMarkets)
 
-instance MarketBook "bitfinex" where
-   marketBook apiSymbol = DataSrc apiUrl cm
-      where cm = clientM apiSymbol "R0" (Just 100)
-            clientM = SC.client (Proxy :: Proxy (ApiBooks base quote))
-   rateLimit = DataSrc apiUrl (return 0.5)
--- Orderbook rate limit: Ratelimit: 30 req/min (https://docs.bitfinex.com/v2/reference#rest-public-books)
+-- | Used to implemented 'rateLimit' for @"bitfinex"@
+marketBook_rateLimit :: DataSrc (RateLimit "bitfinex")
+marketBook_rateLimit = DataSrc apiUrl (return 0.5)
+-- Orderbook rate limit: 30 req/min (https://docs.bitfinex.com/v2/reference#rest-public-books)
 
-instance Json.FromJSON (OB.SomeBook "bitfinex") where
+-- | Used to implemented 'marketBook' for @"bitfinex"@.
+--   Other option: 'marketBook_Agg'
+marketBook_Raw :: Text -> DataSrc (OB.SomeBook "bitfinex")
+marketBook_Raw = fmap fromOrderBookRaw . marketBook_Raw'
+
+marketBook_Raw' :: Text -> DataSrc (OrderBookRaw "bitfinex")
+marketBook_Raw' apiSymbol =
+   DataSrc apiUrl cm
+    where
+   cm = clientM apiSymbol (Just 100)
+   clientM = SC.client (Proxy :: Proxy ApiBooksRaw)
+
+-- | Used to implemented 'marketBook' for @"bitfinex"@.
+--   Other option: 'marketBook_Raw'.
+marketBook_Agg :: Text -> DataSrc (OB.SomeBook "bitfinex")
+marketBook_Agg = fmap fromOrderBookAgg . marketBook_Agg'
+
+marketBook_Agg' :: Text -> DataSrc (OrderBookAgg "bitfinex")
+marketBook_Agg' apiSymbol =
+   DataSrc apiUrl cm
+    where
+   cm = clientM apiSymbol (Just 100)
+   clientM = SC.client (Proxy :: Proxy ApiBooksAgg)
+
+instance Json.FromJSON (OrderBookRaw "bitfinex") where
    parseJSON val =
-      Json.parseJSON val >>= (either fail return . toSomeBook)
+      Json.parseJSON val >>= (either fail return . fmap OrderBookRaw . toSomeBook)
+
+instance Json.FromJSON (OrderBookAgg "bitfinex") where
+   parseJSON val =
+      Json.parseJSON val >>= (either fail return . fmap OrderBookAgg . toSomeBook . Vec.map toOrderRaw)
 
 -- Take a Vector of orders -- as returned by the "books" API -- and
 --  turn them into a 'OB.SomeBook'.
@@ -74,6 +144,15 @@ isBuyOrder (_, _, qty) = qty > 0
 nonZeroPrice :: BitfinexOrder -> Bool
 nonZeroPrice (_, price, _) = price /= 0
 
+-- | (price, count, quantity)
+type BitfinexOrderSet = (Scientific, Int, Scientific)
+
+-- | Compatibility function for re-using logic for
+--    non-aggregated orders with aggregated orders
+toOrderRaw :: BitfinexOrderSet -> BitfinexOrder
+toOrderRaw (price, count, quantity) =
+   (0, price, quantity * fromIntegral count)
+
 -- |
 toSomeOrder
    :: (Rational -> Rational)  -- ^ Modify quantity
@@ -82,15 +161,49 @@ toSomeOrder
 toSomeOrder f (_, price, quantity) =
    OB.mkSomeOrder (f $ toRational quantity) (toRational price)
 
+newtype OrderBookRaw (venue :: Symbol) =
+   OrderBookRaw (OB.SomeBook venue)
+
+newtype OrderBookAgg (venue :: Symbol) =
+   OrderBookAgg (OB.SomeBook venue)
+
+fromOrderBookRaw :: OrderBookRaw venue -> OB.SomeBook venue
+fromOrderBookRaw (OrderBookRaw someBook) = someBook
+
+fromOrderBookAgg :: OrderBookAgg venue -> OB.SomeBook venue
+fromOrderBookAgg (OrderBookAgg someBook) = someBook
+
+-- | don't aggregate orders.
+--   * advantage: 100% price precision.
+--   * disadvantage: only tiny part of order book for large order books
+--                   (e.g. ~0.01% price range for ETH/BTC)
+type NoAggregate = "R0"
+
+-- | aggregate orders.
+--   * advantage: larger part of order book, even for large order books
+--                (e.g. ~5% price range for ETH/BTC)
+--   * disadvantage: less than 100% precision (seemingly 99.9% precision)
+type AggregateLevel1 = "P1"
+
 -- | Docs: https://docs.bitfinex.com/v2/reference#rest-public-books
 --   Example: https://api-pub.bitfinex.com/v2/book/tBTCUSD/R0?len=100
-type ApiBooks base quote
+type ApiBooksRaw
    = "v2"
    :> "book"
    :> Capture "symbol" Text
-   :> Capture "precision" Text
+   :> NoAggregate
    :> QueryParam "len" Word
-   :> Get '[JSON] (OB.SomeBook "bitfinex")
+   :> Get '[JSON] (OrderBookRaw "bitfinex")
+
+-- | Docs: https://docs.bitfinex.com/v2/reference#rest-public-books
+--   Example: https://api-pub.bitfinex.com/v2/book/tBTCUSD/P1?len=100
+type ApiBooksAgg
+   = "v2"
+   :> "book"
+   :> Capture "symbol" Text
+   :> AggregateLevel1
+   :> QueryParam "len" Word
+   :> Get '[JSON] (OrderBookAgg "bitfinex")
 
 -- | Docs: https://docs.bitfinex.com/v2/reference#rest-public-tickers
 --   Example: https://api-pub.bitfinex.com/v2/tickers?symbols=ALL

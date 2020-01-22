@@ -4,6 +4,7 @@ where
 
 import CryptoVenues.Internal.CPrelude
 import qualified CryptoVenues.Venues as Venues
+import           Spec.Orphans ()
 import qualified Spec.RateLimit as RateLimit
 import CryptoVenues.Fetch
 
@@ -18,7 +19,9 @@ minNumMarkets = 5
 
 spec :: HTTP.Manager -> Word -> Spec
 spec man maxRetries = parallel $
-   forM_ Venues.allVenues (testVenue man maxRetries)
+   forM_ allVenuesBitfinexRaw (testVenue man maxRetries)
+  where
+   allVenuesBitfinexRaw = AnyVenue (Proxy :: Proxy "bitfinex-raw") : Venues.allVenues
 
 testVenue :: HTTP.Manager -> Word -> AnyVenue -> Spec
 testVenue man maxRetries av@(AnyVenue (_ :: Proxy venue)) =
