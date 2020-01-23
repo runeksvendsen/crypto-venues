@@ -9,7 +9,7 @@ import qualified Network.HTTP.Client   as HTTP
 data DataSrc dataType = DataSrc
    { dsUrl     :: BaseUrl
    , dsClientM :: SC.ClientM dataType
-   }
+   } deriving Functor
 
 srcFetch
    :: forall m dataType.

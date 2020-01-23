@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module CryptoVenues.Venues
 ( allVenues
 , allVenuesText
@@ -11,12 +12,17 @@ import CryptoVenues.Fetch.MarketBook
 
 import CryptoVenues.Venues.Coinbase     as Coinbase       ()
 import CryptoVenues.Venues.Bitstamp     as Bitstamp       ()
-import CryptoVenues.Venues.Bitfinex     as Bitfinex       ()
+import qualified CryptoVenues.Venues.Bitfinex     as Bitfinex
 import CryptoVenues.Venues.Bittrex      as Bittrex        ()
 import CryptoVenues.Venues.Binance      as Binance        ()
 
 import qualified Data.HashMap.Strict   as HM
 
+
+-- | Choose "aggregated mode". See: "CryptoVenues.Venues.Bitfinex".
+instance MarketBook "bitfinex" where
+   marketBook = Bitfinex.marketBook_Agg
+   rateLimit = Bitfinex.marketBook_rateLimit
 
 -- | Canonical list of all supported venues ('AnyVenue')
 allVenues :: [AnyVenue]
@@ -41,3 +47,4 @@ venueLookup :: Text -> Maybe AnyVenue
 venueLookup = (`HM.lookup` venueMap)
 
 
+   

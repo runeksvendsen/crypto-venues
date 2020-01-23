@@ -14,7 +14,8 @@ jobs:
           command: stack setup
       - run:
           name: Build library
-          command: stack build
+          command: stack build -j1
+          no_output_timeout: 30m
       - run:
           name: Build tests
           command: stack test --no-run-tests
