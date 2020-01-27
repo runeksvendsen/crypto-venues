@@ -11,6 +11,7 @@ import CryptoVenues.Internal.CPrelude
 import OrderBook
 import CryptoVenues.Fetch
 import CryptoVenues.Types.Market
+import CryptoVenues.Types.MarketSymbol
 
 import qualified Servant.Client        as SC
 import qualified Data.Scientific as Sci
@@ -68,12 +69,12 @@ type Api base quote
    :> "v1.1"
    :> "public"
    :> "getorderbook"
-   :> QueryParam "market" Text
+   :> QueryParam "market" (MarketSymbol "bittrex")
    :> QueryParam "type" Text
    :> Get '[JSON] (SomeBook "bittrex")
 
 
-mkBookSrc :: Text -> DataSrc (SomeBook "bittrex")
+mkBookSrc :: MarketSymbol "bittrex" -> DataSrc (SomeBook "bittrex")
 mkBookSrc pair = DataSrc apiUrl (clientM (Just pair) (Just "both"))
    where
    clientM = SC.client (Proxy :: Proxy (Api base quote))
@@ -120,7 +121,7 @@ fromBM BMarket{..} =
             --  https://twitter.com/runeksvendsen/status/945713209406902272
       { miBase       = marketCurrency
       , miQuote      = baseCurrency
-      , miApiSymbol  = marketName
+      , miApiSymbol  = toMarketSymbol marketName
       }
 
 {-

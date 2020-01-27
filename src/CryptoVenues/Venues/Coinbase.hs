@@ -8,6 +8,7 @@ import CryptoVenues.Internal.CPrelude
 import OrderBook
 import CryptoVenues.Fetch
 import CryptoVenues.Types.Market
+import CryptoVenues.Types.MarketSymbol
 import CryptoVenues.Venues.Common.ScientificOrder
 
 import qualified Servant.Client                       as SC
@@ -38,7 +39,7 @@ type ApiMarkets
 
 type ApiOb
    = "products"
-   :> Capture "symbol" Text
+   :> Capture "symbol" (MarketSymbol "coinbase")
    :> "book"
    :> QueryParam "level" Word
    :> Header "User-Agent" Text
@@ -63,7 +64,7 @@ instance Json.FromJSON (Market "coinbase") where
          return Market
             { miBase       = base_currency
             , miQuote      = quote_currency
-            , miApiSymbol  = id
+            , miApiSymbol  = toMarketSymbol id
             }
 
 data Book = Book

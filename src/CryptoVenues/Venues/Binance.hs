@@ -6,6 +6,7 @@ import CryptoVenues.Internal.CPrelude
 import OrderBook
 import CryptoVenues.Fetch
 import CryptoVenues.Types.Market
+import CryptoVenues.Types.MarketSymbol
 import CryptoVenues.Venues.Common.ScientificOrder
 
 import qualified Servant.Client        as SC
@@ -52,11 +53,11 @@ data BSymbol = BSymbol
 instance Json.FromJSON BSymbol
 
 fromSymbol :: BSymbol -> Market "binance"
-fromSymbol BSymbol{..} = Market baseAsset quoteAsset symbol
+fromSymbol BSymbol{..} = Market baseAsset quoteAsset (toMarketSymbol symbol)
 
 type ApiDepth
    =  "depth"
-   :> QueryParam "symbol" Text
+   :> QueryParam "symbol" (MarketSymbol "binance")
    :> QueryParam "limit" Word    -- Legal values: '5, 10, 20, 50, 100, 500, 1000'
    :> Get '[JSON] (SomeBook "binance")
 

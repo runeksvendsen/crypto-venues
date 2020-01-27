@@ -16,5 +16,5 @@ instance EnumMarkets "bitfinex-raw" where
    allMarkets = unsafeCoerce (allMarkets :: DataSrc (MarketList "bitfinex"))
 
 instance MarketBook "bitfinex-raw" where
-   marketBook = unsafeCoerce . Bitfinex.marketBook_Raw
+   marketBook = unsafeCoerce . Bitfinex.marketBook_Raw . unsafeCoerce
    rateLimit = unsafeCoerce Bitfinex.marketBook_rateLimit

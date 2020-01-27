@@ -29,7 +29,7 @@ import qualified Control.RateLimit                          as Lim
 
 -- | Order book fetching
 class EnumMarkets venue => MarketBook venue where
-   marketBook :: Text -> DataSrc (SomeBook venue)  -- ^ Fetch a 'SomeBook' given a 'Market' 'miApiSymbol'
+   marketBook :: MarketSymbol venue -> DataSrc (SomeBook venue)   -- ^ Fetch a 'SomeBook' given a 'Market' 'miApiSymbol'
    rateLimit  :: DataSrc (RateLimit venue)         -- ^ How often can we fetch using 'marketBook'?
 
 -- |

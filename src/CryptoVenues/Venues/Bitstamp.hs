@@ -8,6 +8,7 @@ import CryptoVenues.Internal.CPrelude
 import OrderBook
 import CryptoVenues.Fetch
 import CryptoVenues.Types.Market
+import CryptoVenues.Types.MarketSymbol
 import CryptoVenues.Venues.Common.ScientificOrder
 
 import qualified Servant.Client        as SC
@@ -59,7 +60,7 @@ type ApiOb
    = "api"
    :> "v2"
    :> "order_book"
-   :> Capture "symbol" Text
+   :> Capture "symbol" (MarketSymbol "bitstamp")
    :> Header "User-Agent" Text
    :> Get '[JSON] (SomeBook "bitstamp")
 
@@ -111,6 +112,6 @@ instance Json.FromJSON (Market "bitstamp") where
             [base,quote] -> return Market
                   { miBase       = T.toUpper base
                   , miQuote      = T.toUpper quote
-                  , miApiSymbol  = url_symbol
+                  , miApiSymbol  = toMarketSymbol url_symbol
                   }
             _            -> fail . toS $ "Bad market name: " <> name

@@ -51,6 +51,7 @@ import CryptoVenues.Internal.CPrelude     hiding (asks)
 import qualified OrderBook.Types          as OB
 import CryptoVenues.Fetch
 import CryptoVenues.Types.Market
+import CryptoVenues.Types.MarketSymbol
 import CryptoVenues.Venues.Common.ScientificOrder
 
 import qualified Servant.Client        as SC
@@ -90,10 +91,10 @@ marketBook_rateLimit = DataSrc apiUrl (return 0.5)
 
 -- | Used to implemented 'marketBook' for @"bitfinex"@.
 --   Other option: 'marketBook_Agg'
-marketBook_Raw :: Text -> DataSrc (OB.SomeBook "bitfinex")
+marketBook_Raw :: MarketSymbol "bitfinex" -> DataSrc (OB.SomeBook "bitfinex")
 marketBook_Raw = fmap fromOrderBookRaw . marketBook_Raw'
 
-marketBook_Raw' :: Text -> DataSrc (OrderBookRaw "bitfinex")
+marketBook_Raw' :: MarketSymbol "bitfinex" -> DataSrc (OrderBookRaw "bitfinex")
 marketBook_Raw' apiSymbol =
    DataSrc apiUrl cm
     where
@@ -102,10 +103,10 @@ marketBook_Raw' apiSymbol =
 
 -- | Used to implemented 'marketBook' for @"bitfinex"@.
 --   Other option: 'marketBook_Raw'.
-marketBook_Agg :: Text -> DataSrc (OB.SomeBook "bitfinex")
+marketBook_Agg :: MarketSymbol "bitfinex" -> DataSrc (OB.SomeBook "bitfinex")
 marketBook_Agg = fmap fromOrderBookAgg . marketBook_Agg'
 
-marketBook_Agg' :: Text -> DataSrc (OrderBookAgg "bitfinex")
+marketBook_Agg' :: MarketSymbol "bitfinex" -> DataSrc (OrderBookAgg "bitfinex")
 marketBook_Agg' apiSymbol =
    DataSrc apiUrl cm
     where
@@ -190,7 +191,7 @@ type AggregateLevel1 = "P1"
 type ApiBooksRaw
    = "v2"
    :> "book"
-   :> Capture "symbol" Text
+   :> Capture "symbol" (MarketSymbol "bitfinex")
    :> NoAggregate
    :> QueryParam "len" Word
    :> Get '[JSON] (OrderBookRaw "bitfinex")
@@ -200,7 +201,7 @@ type ApiBooksRaw
 type ApiBooksAgg
    = "v2"
    :> "book"
-   :> Capture "symbol" Text
+   :> Capture "symbol" (MarketSymbol "bitfinex")
    :> AggregateLevel1
    :> QueryParam "len" Word
    :> Get '[JSON] (OrderBookAgg "bitfinex")
@@ -264,5 +265,5 @@ fromPairCode pairCode
       Just $ Market
             { miBase       = base
             , miQuote      = quote
-            , miApiSymbol  = pairCode
+            , miApiSymbol  = toMarketSymbol pairCode
             }
