@@ -3,8 +3,8 @@ version:             0.3.0.0
 github:              "runeksvendsen/crypto-venues"
 license:             BSD3
 author:              "Rune K. Svendsen"
-maintainer:          "example@example.com"
-copyright:           "2017 Author name here"
+maintainer:          "runesvend@gmail.com"
+copyright:           "2019 Rune K. Svendsen"
 
 extra-source-files:
 - README.md
