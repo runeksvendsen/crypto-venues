@@ -60,10 +60,30 @@ data FetchErr
    | ConnectionErr String       -- ^ Something's wrong with the connection
    | EndpointErr BaseUrl        -- ^ The endpoint messed up
    | InternalErr T.Text         -- ^ We messed up
-      deriving (Eq, Show, Generic)  -- TODO: Proper Show instance
+      deriving (Eq, Generic)
 
--- instance Show FetchErr where
---     show (EndpointErr url) = "EndpointErr: " ++ show (showBaseUrl url)
+instance Show FetchErr where
+   show (TooManyRequests waitingTimeM) =
+      let fromWaitingTime = format $ " (waiting time " % int % " seconds)"
+      in toS $
+         format
+            ("Too many requests" % text)
+            (maybe "" fromWaitingTime waitingTimeM)
+   show (ConnectionErr err) =
+      unlines
+         [ "Connection error:"
+         , err
+         ]
+   show (EndpointErr baseUrl) =
+      unlines
+         [ "Endpoint error:"
+         , show baseUrl
+         ]
+   show (InternalErr err) =
+      unlines
+         [ "InternalErr error:"
+         , toS err
+         ]
 
 data VenueFetchErr
    = forall venue.
