@@ -32,9 +32,9 @@ testRequest
     :: HTTP.Manager
     -> Word
     -> (Word -> Word -> SC.ClientM b, BaseUrl)
-    -> Word
+    -> QC.Positive Word
     -> IO ()
-testRequest man statusCode (client, baseUrl) secs = do
+testRequest man statusCode (client, baseUrl) (QC.Positive secs) = do
     resE <- SC.runClientM (client statusCode secs) (SC.ClientEnv man baseUrl Nothing)
     let fetchErr (Left err) = Error.fromServant baseUrl err
         fetchErr (Right _) = error "Success response"

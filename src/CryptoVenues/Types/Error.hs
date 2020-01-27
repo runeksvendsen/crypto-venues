@@ -112,7 +112,21 @@ handleStatusCode res url
     | statusCode == 429 ||
       -- "binance" returns 418 when the client has been banned.
       -- interpret this as "TooManyRequests"
-      statusCode == 418 = TooManyRequests (headerRetryAfter res)
+      statusCode == 418 =
+         let retryAfterM = headerRetryAfter res
+             retryAfterActualM =
+               if retryAfterM == Just 0
+                  then Nothing
+                  else retryAfterM
+         -- Ignore "Retry-After" headers that specify a waiting time of zero seconds.
+         -- Rationale: a server saying
+         --    1) that a client is issuing too many requests, and
+         --    2) that the client should try again immediately after
+         -- doesn't make sense. This behaviour only *increases* the burden
+         --  on the server, without helping the client in any way.
+         -- This response is therefore interpreted as a server bug
+         --  and ignored.
+         in TooManyRequests retryAfterActualM
     | statusCode >= 500 && statusCode < 600 = EndpointErr url
     | otherwise = InternalErr failureResponseText
   where
