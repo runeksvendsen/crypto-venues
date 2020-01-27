@@ -19,14 +19,15 @@ import Servant.API
 import qualified Data.Aeson   as Json
 import qualified Data.Aeson.Types   as Json
 import           Data.Vector  (Vector)
+import qualified Data.Vector as Vec
 import qualified Data.Char as Char
 
 
 instance Json.FromJSON (SomeBook "bittrex") where
    parseJSON val =
       let fromBook Book{..} = mkSomeBook
-            <$> traverse parseOrder buy
-            <*> traverse parseOrder sell
+            <$> traverse parseOrder (fromMaybe Vec.empty buy)
+            <*> traverse parseOrder (fromMaybe Vec.empty sell)
       in Json.parseJSON val >>= fromBook . result >>= either fail return
 
 newtype Wrap res = Wrap
@@ -36,8 +37,8 @@ newtype Wrap res = Wrap
 instance Json.FromJSON res => Json.FromJSON (Wrap res)
 
 data Book = Book
-   { buy    :: Vector BittrexOrder
-   , sell   :: Vector BittrexOrder
+   { buy    :: Maybe (Vector BittrexOrder)
+   , sell   :: Maybe (Vector BittrexOrder)
    } deriving Generic
 
 instance Json.FromJSON Book
