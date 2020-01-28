@@ -4,7 +4,9 @@
 | :------------- | :----------: |
 |  [<img src="https://travis-ci.com/runeksvendsen/crypto-venues.svg?branch=master">](https://travis-ci.com/runeksvendsen/crypto-venues) | [![CircleCI](https://circleci.com/gh/runeksvendsen/crypto-venues.svg?style=svg)](https://circleci.com/gh/runeksvendsen/crypto-venues)   |
 
-### Fetch order book data from various cryptocurrency exchanges. [Currently supported venues](https://github.com/runeksvendsen/crypto-venues/blob/master/src/CryptoVenues/Venues.hs#L24).
+### Fetch order book data from various cryptocurrency exchanges.
+
+[Currently supported venues](https://github.com/runeksvendsen/crypto-venues/tree/ebf1fcbcee80bf71721cd581c2751476dffbbc45/src/CryptoVenues/Venues.hs#L30-L34).
 
 This library enables:
 
