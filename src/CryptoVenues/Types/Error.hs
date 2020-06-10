@@ -58,8 +58,9 @@ data FetchErr
    = TooManyRequests (Maybe Time.Second)  -- ^ We should slow down
                                           --  (Maybe the time we should wait before next request)
    | ConnectionErr String       -- ^ Something's wrong with the connection
-   | EndpointErr BaseUrl        -- ^ The endpoint messed up
-   | InternalErr T.Text         -- ^ We messed up
+   | EndpointErr BaseUrl        -- ^ The endpoint messed up. HTTP status code 5xx.
+   | InternalErr T.Text         -- ^ We messed up.
+                                --   E.g.: response decode failure, unsupported content type, invalid content type header.
       deriving (Eq, Generic)
 
 instance Show FetchErr where
