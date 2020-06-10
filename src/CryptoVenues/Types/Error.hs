@@ -58,7 +58,7 @@ data FetchErr
    = TooManyRequests (Maybe Time.Second)  -- ^ We should slow down
                                           --  (Maybe the time we should wait before next request)
    | ConnectionErr String       -- ^ Something's wrong with the connection
-   | EndpointErr BaseUrl        -- ^ The endpoint messed up. HTTP status code 5xx.
+   | EndpointErr BaseUrl Status.Status -- ^ The endpoint messed up. HTTP status code 5xx.
    | InternalErr T.Text         -- ^ We messed up.
                                 --   E.g.: response decode failure, unsupported content type, invalid content type header.
       deriving (Eq, Generic)
@@ -75,10 +75,11 @@ instance Show FetchErr where
          [ "Connection error:"
          , err
          ]
-   show (EndpointErr baseUrl) =
+   show (EndpointErr baseUrl status) =
       unlines
          [ "Endpoint error:"
-         , show baseUrl
+         , showBaseUrl baseUrl
+         , show (Status.statusCode status) <> " (" <> toS (Status.statusMessage status) <> ")"
          ]
    show (InternalErr err) =
       unlines
@@ -103,7 +104,7 @@ toRetryAction Error{..} =
 
 toRetryActionFE :: FetchErr -> Re.RetryAction
 toRetryActionFE (InternalErr _)   = Re.DontRetry
-toRetryActionFE (EndpointErr _)   = Re.ConsultPolicy
+toRetryActionFE (EndpointErr _ _) = Re.ConsultPolicy
 toRetryActionFE (ConnectionErr _) = Re.ConsultPolicy
 toRetryActionFE (TooManyRequests timeM) =
    maybe Re.ConsultPolicy overrideDelay timeM
@@ -148,7 +149,7 @@ handleStatusCode res url
          -- This response is therefore interpreted as a server bug
          --  and ignored.
          in TooManyRequests retryAfterActualM
-    | statusCode >= 500 && statusCode < 600 = EndpointErr url
+    | statusCode >= 500 && statusCode < 600 = EndpointErr url status
     | otherwise = InternalErr failureResponseText
   where
     status = responseStatusCode res
