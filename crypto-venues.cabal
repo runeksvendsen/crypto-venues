@@ -1,0 +1,155 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.1.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 5f2e9b5d0606b2f84b933ed10898924a7955b6aca899bf0b4887298d5c41e76b
+
+name:           crypto-venues
+version:        0.3.0.0
+synopsis:       Fetch order books from cryptocurrency exchanges
+description:    Please see the README on Github at <https://github.com/runeksvendsen/crypto-venues#readme>
+homepage:       https://github.com/runeksvendsen/crypto-venues#readme
+bug-reports:    https://github.com/runeksvendsen/crypto-venues/issues
+author:         Rune K. Svendsen
+maintainer:     runesvend@gmail.com
+copyright:      2019 Rune K. Svendsen
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/runeksvendsen/crypto-venues
+
+library
+  exposed-modules:
+      CryptoVenues
+      CryptoVenues.Fetch
+      CryptoVenues.Fetch.DataSrc
+      CryptoVenues.Fetch.Debug
+      CryptoVenues.Fetch.EnumMarkets
+      CryptoVenues.Fetch.MarketBook
+      CryptoVenues.Internal.CPrelude
+      CryptoVenues.Internal.Log
+      CryptoVenues.Internal.Prelude
+      CryptoVenues.Internal.RateLimitCache
+      CryptoVenues.Types.ABook
+      CryptoVenues.Types.AppM
+      CryptoVenues.Types.AppM.Internal
+      CryptoVenues.Types.Error
+      CryptoVenues.Types.Market
+      CryptoVenues.Types.MarketSymbol
+      CryptoVenues.Types.RateLimit
+      CryptoVenues.Venues
+      CryptoVenues.Venues.Binance
+      CryptoVenues.Venues.Bitfinex
+      CryptoVenues.Venues.Bitstamp
+      CryptoVenues.Venues.Bittrex
+      CryptoVenues.Venues.Coinbase
+      CryptoVenues.Venues.Common.ScientificOrder
+  other-modules:
+      Paths_crypto_venues
+  hs-source-dirs:
+      src
+  default-extensions: StrictData BangPatterns NoImplicitPrelude ScopedTypeVariables MultiParamTypeClasses ScopedTypeVariables OverloadedStrings KindSignatures DataKinds FlexibleInstances DeriveGeneric RecordWildCards DuplicateRecordFields FlexibleContexts DeriveFunctor TypeOperators
+  ghc-options: -Wall
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bimap
+    , bytestring
+    , cache
+    , clock
+    , containers
+    , deepseq
+    , errors
+    , fgl
+    , formatting
+    , hashable
+    , http-client
+    , http-client-tls
+    , http-types
+    , logging
+    , monad-parallel
+    , mtl
+    , orderbook
+    , pretty-show
+    , protolude
+    , rate-limit
+    , retry >=0.8.1.0
+    , safe
+    , safe-money
+    , scientific
+    , servant
+    , servant-client
+    , servant-client-core
+    , servant-docs
+    , servant-server
+    , text
+    , time-units
+    , transformers
+    , unordered-containers
+    , utf8-string
+    , vector
+  default-language: Haskell2010
+
+executable write-test-data
+  main-is: WriteTestData.hs
+  other-modules:
+      Paths_crypto_venues
+  hs-source-dirs:
+      app/
+  default-extensions: StrictData BangPatterns NoImplicitPrelude ScopedTypeVariables MultiParamTypeClasses ScopedTypeVariables OverloadedStrings KindSignatures DataKinds FlexibleInstances DeriveGeneric RecordWildCards DuplicateRecordFields FlexibleContexts DeriveFunctor TypeOperators
+  ghc-options: -Wall -fno-warn-name-shadowing
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , crypto-venues
+    , errors
+    , http-client
+    , http-client-tls
+    , logging
+    , optparse-applicative
+    , text
+  default-language: Haskell2010
+
+test-suite crypto-venues-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Spec.Orphans
+      Spec.RateLimit
+      Spec.RetryAfter
+      Spec.RetryAfter.Server
+      Spec.VenueFetch
+      Paths_crypto_venues
+  hs-source-dirs:
+      test
+  default-extensions: StrictData BangPatterns NoImplicitPrelude ScopedTypeVariables MultiParamTypeClasses ScopedTypeVariables OverloadedStrings KindSignatures DataKinds FlexibleInstances DeriveGeneric RecordWildCards DuplicateRecordFields FlexibleContexts DeriveFunctor TypeOperators
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HUnit
+    , QuickCheck
+    , base >=4.7 && <5
+    , crypto-venues
+    , hspec
+    , hspec-expectations-pretty-diff
+    , hspec-smallcheck
+    , http-client
+    , http-client-tls
+    , protolude
+    , servant
+    , servant-client
+    , servant-client-core
+    , servant-server
+    , smallcheck
+    , tasty
+    , tasty-quickcheck
+    , tasty-smallcheck
+    , wai
+    , warp
+  default-language: Haskell2010
