@@ -15,6 +15,7 @@ import CryptoVenues.Venues.Bitstamp     as Bitstamp       ()
 import qualified CryptoVenues.Venues.Bitfinex     as Bitfinex
 import CryptoVenues.Venues.Bittrex      as Bittrex        ()
 import CryptoVenues.Venues.Binance      as Binance        ()
+import CryptoVenues.Venues.BinanceFut   as BinanceFut     ()
 
 import qualified Data.HashMap.Strict   as HM
 
@@ -30,6 +31,7 @@ allVenues =
    [ AnyVenue (Proxy :: Proxy "bitfinex")
    , AnyVenue (Proxy :: Proxy "bittrex")
    , AnyVenue (Proxy :: Proxy "binance")
+   , AnyVenue (Proxy :: Proxy "binance-fut")
    , AnyVenue (Proxy :: Proxy "bitstamp")
    , AnyVenue (Proxy :: Proxy "coinbase")
    ]
@@ -45,6 +47,3 @@ venueMap = HM.fromList $ map (\v@(AnyVenue p) -> (toS $ symbolVal p, v)) allVenu
 -- | Lookup by 'Text' string in the map of all venues
 venueLookup :: Text -> Maybe AnyVenue
 venueLookup = (`HM.lookup` venueMap)
-
-
-   
