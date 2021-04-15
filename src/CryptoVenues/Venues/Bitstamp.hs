@@ -95,23 +95,39 @@ data BMarket = BMarket
    { base_decimals      :: Word
    , name               :: Text -- E.g. "LTC/USD"
    , counter_decimals   :: Word
-   , trading            :: Text -- E.g. "Enabled"
+   , trading            :: TradingStatus
    , url_symbol         :: Text -- E.g. "ltcusd"
    } deriving (Eq, Show, Generic)
+
+data TradingStatus
+   = Enabled
+   | Disabled
+   | UnknownTradingStatus
+      deriving (Eq, Show, Generic)
+
+instance Json.FromJSON TradingStatus where
+   parseJSON =
+      let fromText "Enabled" = Enabled
+          fromText "Disabled" = Disabled
+          fromText _ = UnknownTradingStatus
+      in Json.withText "trading status" (pure . fromText)
 
 instance Json.FromJSON BMarket
 
 instance Json.FromJSON (MarketList "bitstamp") where
-   parseJSON val = MarketList <$> Json.parseJSON val
+   parseJSON val = do
+      bMarketLst <- filter ((== Enabled) . trading) <$> Json.listParser Json.parseJSON val
+      MarketList <$> traverse fromBMarket bMarketLst
 
 instance Json.FromJSON (Market "bitstamp") where
    parseJSON val = Json.parseJSON val >>= fromBMarket
-      where
-      fromBMarket BMarket{..} =
-         case T.split (== '/') name of
-            [base,quote] -> return Market
-                  { miBase       = T.toUpper base
-                  , miQuote      = T.toUpper quote
-                  , miApiSymbol  = toMarketSymbol url_symbol
-                  }
-            _            -> fail . toS $ "Bad market name: " <> name
+
+fromBMarket :: BMarket -> Json.Parser (Market venue)
+fromBMarket BMarket{..} =
+   case T.split (== '/') name of
+      [base,quote] -> return Market
+            { miBase       = T.toUpper base
+            , miQuote      = T.toUpper quote
+            , miApiSymbol  = toMarketSymbol url_symbol
+            }
+      _            -> fail . toS $ "Bad market name: " <> name
