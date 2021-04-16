@@ -27,7 +27,7 @@ allBooksSimple = allBooks (Proxy :: Proxy "USD") maxBound
 allBooks
     :: KnownSymbol numeraire
     => Proxy numeraire  -- ^ Only used for debugging (must exist though)
-    -> Word
+    -> Int
     -> AppM.AppM IO [Either AppM.Error [ABook]]
 allBooks p numObLimit =
     Par.forM Venues.allVenues (AppM.evalAppM . fetchVenueBooks p numObLimit)
@@ -38,16 +38,28 @@ fetchVenueBooks
    :: forall numeraire.
       (KnownSymbol numeraire)
    => Proxy numeraire
-   -> Word
+   -> Int
    -> Venues.AnyVenue
    -> AppM.AppM IO [ABook]
-fetchVenueBooks _ numObLimit (Venues.AnyVenue (_ :: Proxy venue)) = do
+fetchVenueBooks numeraire numObLimit (Venues.AnyVenue (_ :: Proxy venue)) = do
     allMarkets :: [Market venue] <- EnumMarkets.marketList
-    -- Begin DEBUG stuff
-    let btcEth = ["BTC", "ETH"]
-        numeraire = T.pack $ symbolVal (Proxy :: Proxy numeraire)
-        numeraireLst = filter (\mkt -> miBase mkt `elem` btcEth && miQuote mkt == numeraire) allMarkets
-        markets = take (fromIntegral numObLimit - length numeraireLst) (allMarkets \\ numeraireLst)
-        marketList = numeraireLst ++ markets
-    -- End DEBUG stuff
+    let marketList = debugFilterMarkets numeraire numObLimit allMarkets
     map toABook <$> mapM fetchMarketBook marketList
+
+
+-- | Reduce the maximum number of fetched order books. Used for testing.
+debugFilterMarkets
+    :: forall numeraire venue.
+       KnownSymbol numeraire
+    => Proxy numeraire
+    -> Int
+    -> [Market venue]
+    -> [Market venue]
+debugFilterMarkets _ numObLimit allMarkets =
+    numeraireLst ++ markets
+  where
+    btcEth = ["BTC", "ETH"]
+    numeraire = T.pack $ symbolVal (Proxy :: Proxy numeraire)
+    numeraireLst = filter (\mkt -> miBase mkt `elem` btcEth && miQuote mkt == numeraire) allMarkets
+    numElem = fromIntegral numObLimit - length numeraireLst
+    markets = take numElem (allMarkets \\ numeraireLst)

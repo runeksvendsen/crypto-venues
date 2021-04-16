@@ -59,7 +59,7 @@ opts = info options $
 
 data Options = Options
   { progCommand :: Command
-  , obCount     :: Word
+  , obCount     :: Int
   }
 
 data Command
@@ -91,7 +91,7 @@ targetFile' = strOption
   <> metavar "FILEPATH"
   <> help "File path to write test data to" )
 
-obCount' :: Parser Word
+obCount' :: Parser Int
 obCount' = option auto
   ( long "ob-count"
   <> short 'c'
