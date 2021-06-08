@@ -80,6 +80,7 @@ library:
   - logging
   - formatting
   - utf8-string   # CryptoVenues.Venues.Bitstamp
+  - exceptions
 
 tests:
   crypto-venues-test:

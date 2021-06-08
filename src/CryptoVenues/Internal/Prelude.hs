@@ -13,6 +13,7 @@ module CryptoVenues.Internal.Prelude
 , fail
 , S.BaseUrl(..), S.Scheme(..)
 , show'
+, groupOnOrd
 )
 where
 
@@ -38,3 +39,13 @@ sameSym a b = isJust (sameSymbol a b)
 
 instance MonadFail (Either Text) where
   fail = Left . toS
+
+-- | @groupOnOrd f lst@ first sorts the list by @f@ and then groups by @f@.
+--
+-- Example:
+--
+-- >>> groupOnOrd fst [("a", 1), ("b", 2), ("a", 3)]
+-- [[("a",1),("a",3)],[("b",2)]]
+groupOnOrd :: Ord o => (t -> o) -> [t] -> [[t]]
+groupOnOrd f =
+  groupBy (\m1 m2 -> f m1 == f m2) . sortOn f
