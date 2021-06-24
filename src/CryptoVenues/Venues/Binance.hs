@@ -115,8 +115,17 @@ perSecond (BRateLimit _ DAY    limit) = fromRational (fromIntegral limit % 3600*
 
 instance Json.FromJSON BRateLimit
 
-data LimitType = REQUEST_WEIGHT | ORDERS deriving (Eq, Generic)
-instance Json.FromJSON LimitType
+data LimitType
+   = REQUEST_WEIGHT
+   | ORDERS
+   | OtherLimit
+      deriving (Eq, Generic)
+instance Json.FromJSON LimitType where
+   parseJSON = Json.withText "LimitType" $ \text -> pure $
+      case text of
+         "REQUEST_WEIGHT" -> REQUEST_WEIGHT
+         "ORDERS" -> ORDERS
+         _ -> OtherLimit
 
 data LimitInterval = SECOND | MINUTE | DAY deriving (Eq, Generic)
 instance Json.FromJSON LimitInterval
