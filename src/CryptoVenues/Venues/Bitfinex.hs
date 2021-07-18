@@ -48,6 +48,7 @@ module CryptoVenues.Venues.Bitfinex
 where
 
 import CryptoVenues.Internal.CPrelude     hiding (asks)
+import qualified CryptoVenues.Venues.Bitfinex.Mapping as Mapping
 import qualified OrderBook.Types          as OB
 import CryptoVenues.Fetch
 import CryptoVenues.Types.Market
@@ -82,7 +83,12 @@ apiUrl = BaseUrl Https "api-pub.bitfinex.com" 443 ""
 instance EnumMarkets "bitfinex" where
    allMarkets = DataSrc apiUrl (clientM $ Just "ALL")
       where
-         clientM = SC.client (Proxy :: Proxy ApiMarkets)
+         clientApiMarkets = SC.client (Proxy :: Proxy ApiMarkets)
+         clientApiMapping = SC.client (Proxy :: Proxy Mapping.ApiMapping)
+         clientM apiMarkets = do
+            markets <- clientApiMarkets apiMarkets
+            mapping <- Mapping.responseMapping <$> clientApiMapping
+            Mapping.normalize mapping markets
 
 -- | Used to implemented 'rateLimit' for @"bitfinex"@
 marketBook_rateLimit :: DataSrc (RateLimit "bitfinex")
@@ -212,9 +218,9 @@ type ApiMarkets
    = "v2"
    :> "tickers"
    :> QueryParam "symbols" Text
-   :> Get '[JSON] (MarketList "bitfinex")
+   :> Get '[JSON] (MarketList "bitfinex_internal")
 
-instance Json.FromJSON (MarketList "bitfinex") where
+instance Json.FromJSON (MarketList "bitfinex_internal") where
    parseJSON = Json.withArray "bitfinex MarketList" $ \vector ->
       -- NB: We ignore symbols not starting with "t".
       --     E.g.: "funding symbols", which start with "f".
@@ -226,7 +232,7 @@ instance Json.FromJSON (MarketList "bitfinex") where
          marketVector <- traverse (either fail return . parsePairCode) pairCodeVector
          return $ MarketList (Vec.toList marketVector)
 
-parsePairCode :: Text -> Either String (Market "bitfinex")
+parsePairCode :: Text -> Either String (Market "bitfinex_internal")
 parsePairCode currPair =
    let errorStr = "Invalid trading pair code: " ++ toS currPair
    in maybe (Left errorStr) Right (fromPairCode currPair)
@@ -250,7 +256,7 @@ getPairCode vec =
 --       * base/quote currency separated by colon (':') character
 fromPairCode
    :: T.Text
-   -> Maybe (Market "bitfinex")
+   -> Maybe (Market "bitfinex_internal")
 fromPairCode pairCode
    | T.length cutPairCode == 6 =
       mkMarket (T.toUpper $ T.take 3 cutPairCode) (T.toUpper $ T.takeEnd 3 cutPairCode)
