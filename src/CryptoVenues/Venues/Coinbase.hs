@@ -50,18 +50,17 @@ data CMarket = CMarket
    { id              :: Text  -- E.g. "BTC-USD"
    , base_currency   :: Text  -- E.g. "BTC"
    , quote_currency  :: Text  -- E.g. "USD"
+   , status          :: Text
    } deriving (Eq, Show, Generic)
 
 instance Json.FromJSON CMarket
 
 instance Json.FromJSON (MarketList "coinbase") where
-   parseJSON val = MarketList <$> Json.parseJSON val
-
-instance Json.FromJSON (Market "coinbase") where
-   parseJSON val = Json.parseJSON val >>= fromCMarket
+   parseJSON val = MarketList . map fromCMarket . filter isNotDelisted <$> Json.parseJSON val
       where
+      isNotDelisted cMarket = status cMarket /= "delisted"
       fromCMarket CMarket{..} =
-         return Market
+         Market
             { miBase       = base_currency
             , miQuote      = quote_currency
             , miApiSymbol  = toMarketSymbol id
