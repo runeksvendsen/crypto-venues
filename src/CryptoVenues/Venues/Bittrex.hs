@@ -1,60 +1,49 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
+{-# LANGUAGE LambdaCase #-}
 {-
-   https://bittrex.com/home/api
+   https://bittrex.github.io/api/v3
 -}
 module CryptoVenues.Venues.Bittrex
 ()
 where
 
 import CryptoVenues.Internal.CPrelude
+import CryptoVenues.Venues.Common.ScientificOrder (QuotedScientific)
 import OrderBook
 import CryptoVenues.Fetch
 import CryptoVenues.Types.Market
 import CryptoVenues.Types.MarketSymbol
 
 import qualified Servant.Client        as SC
-import qualified Data.Scientific as Sci
 import Servant.API
 import qualified Data.Aeson   as Json
 import qualified Data.Aeson.Types   as Json
 import           Data.Vector  (Vector)
 import qualified Data.Vector as Vec
-import qualified Data.Char as Char
-
 
 instance Json.FromJSON (SomeBook "bittrex") where
    parseJSON val =
       let fromBook Book{..} = mkSomeBook
-            <$> traverse parseOrder (fromMaybe Vec.empty buy)
-            <*> traverse parseOrder (fromMaybe Vec.empty sell)
-      in Json.parseJSON val >>= fromBook . result >>= either fail return
-
-newtype Wrap res = Wrap
-   { result :: res
-   } deriving Generic
-
-instance Json.FromJSON res => Json.FromJSON (Wrap res)
+            <$> traverse parseOrder (fromMaybe Vec.empty bid)
+            <*> traverse parseOrder (fromMaybe Vec.empty ask)
+      in Json.parseJSON val >>= fromBook >>= either fail return
 
 data Book = Book
-   { buy    :: Maybe (Vector BittrexOrder)
-   , sell   :: Maybe (Vector BittrexOrder)
-   } deriving Generic
+   { bid :: Maybe (Vector BittrexOrder)
+   , ask :: Maybe (Vector BittrexOrder)
+   } deriving (Show, Generic)
 
 instance Json.FromJSON Book
 
 data BittrexOrder = BittrexOrder
-   { quantity  :: Sci.Scientific
-   , rate      :: Sci.Scientific
+   { quantity  :: QuotedScientific
+   , rate      :: QuotedScientific
    } deriving (Show, Generic)
 
 instance Json.FromJSON BittrexOrder where
   parseJSON  = Json.genericParseJSON
-      (Json.defaultOptions { Json.fieldLabelModifier = firstCharUpper })
-
-firstCharUpper :: String -> String
-firstCharUpper [] = []
-firstCharUpper (c1:cs) = Char.toUpper c1 : cs
+      Json.defaultOptions
 
 parseOrder :: BittrexOrder -> Json.Parser SomeOrder
 parseOrder bo@BittrexOrder{..} =
@@ -62,41 +51,65 @@ parseOrder bo@BittrexOrder{..} =
    where soM = mkSomeOrder (toRational quantity) (toRational rate)
 
 apiUrl :: BaseUrl
-apiUrl = BaseUrl Https "bittrex.com" 443 ""
+apiUrl = BaseUrl Https "api.bittrex.com" 443 ""
 
--- | Example: https://bittrex.com/api/v1.1/public/getorderbook?market=BTC-ADA&type=both
+-- | Example: https://api.bittrex.com/v3/markets/BTC-USD/orderbook
 type Api base quote
-   = "api"
-   :> "v1.1"
-   :> "public"
-   :> "getorderbook"
-   :> QueryParam "market" (MarketSymbol "bittrex")
-   :> QueryParam "type" Text
+   = "v3"
+   :> "markets"
+   :> Capture "symbol" (MarketSymbol "bittrex")
+   :> "orderbook"
+   :> QueryParam "depth" Depth
    :> Get '[JSON] (SomeBook "bittrex")
 
-
 mkBookSrc :: MarketSymbol "bittrex" -> DataSrc (SomeBook "bittrex")
-mkBookSrc pair = DataSrc apiUrl (clientM (Just pair) (Just "both"))
+mkBookSrc pair = DataSrc apiUrl (clientM pair (Just MaxDepth))
    where
    clientM = SC.client (Proxy :: Proxy (Api base quote))
 
 data BMarket = BMarket
-   { marketCurrency :: Text
-   , baseCurrency   :: Text
-   , marketName     :: Text
-   , isActive       :: Bool
-   } deriving Generic
+   { baseCurrencySymbol :: Text
+   , quoteCurrencySymbol :: Text
+   , symbol :: Text
+   , status :: Status
+   } deriving (Show, Generic)
+
+data Depth
+   = MaxDepth
+   | DefaultDepth
+   | MinDepth
+
+depthInteger :: Depth -> Int
+depthInteger = \case
+   MaxDepth -> 500
+   DefaultDepth -> 25
+   MinDepth -> 1
+
+instance ToHttpApiData Depth where
+  toUrlPiece = toS . show . depthInteger
+  toQueryParam = toS . show . depthInteger
+
+data Status
+   = Online
+   | Unknown
+       deriving (Eq, Show)
+
+statusFromText :: Text -> Status
+statusFromText = \case
+   "ONLINE" -> Online
+   _ -> Unknown
+
+instance Json.FromJSON Status where
+   parseJSON = Json.withText "Status" (pure . statusFromText)
 
 instance Json.FromJSON BMarket where
   parseJSON = Json.genericParseJSON
-      Json.defaultOptions { Json.fieldLabelModifier = firstCharUpper }
+      Json.defaultOptions
 
--- | https://bittrex.com/api/v1.1/public/getmarkets
+-- | https://api.bittrex.com/v3/markets
 type ApiMarkets
-   = "api"
-   :> "v1.1"
-   :> "public"
-   :> "getmarkets"
+   = "v3"
+   :> "markets"
    :> Get '[JSON] (MarketList "bittrex")
 
 instance MarketBook "bittrex" where
@@ -111,46 +124,13 @@ instance EnumMarkets "bittrex" where
 
 instance Json.FromJSON (MarketList "bittrex") where
    parseJSON val = do
-      wrap <- Json.parseJSON val
-      return $ MarketList $ map fromBM (result wrap)
-
---instance Json.FromJSON (Market "bittrex") where
+      result <- Json.parseJSON val
+      return $ MarketList $ map fromBM $ filter ((== Online) . status) result
 
 fromBM :: BMarket -> Market venue
 fromBM BMarket{..} =
-   Market   -- Bittrex swaps around base/quote currency:
-            --  https://twitter.com/runeksvendsen/status/945713209406902272
-      { miBase       = marketCurrency
-      , miQuote      = baseCurrency
-      , miApiSymbol  = toMarketSymbol marketName
+   Market
+      { miBase       = baseCurrencySymbol
+      , miQuote      = quoteCurrencySymbol
+      , miApiSymbol  = toMarketSymbol symbol
       }
-
-{-
-    {
-	"success" : true,
-	"message" : "",
-	"result" : {
-		"buy" : [{
-				"Quantity" : 12.37000000,
-				"Rate" : 0.02525000
-			}
-		],
-		"sell" : [{
-				"Quantity" : 32.55412402,
-				"Rate" : 0.02540000
-			}, {
-				"Quantity" : 60.00000000,
-				"Rate" : 0.02550000
-			}, {
-				"Quantity" : 60.00000000,
-				"Rate" : 0.02575000
-			}, {
-				"Quantity" : 84.00000000,
-				"Rate" : 0.02600000
-			}
-		]
-	}
-}
-
- -}
-
