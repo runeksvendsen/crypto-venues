@@ -21,6 +21,7 @@ import qualified Network.HTTP.Types.Status   as Status
 import qualified Data.ByteString.Lazy.UTF8   as BS
 import Data.List                             (isInfixOf)
 import qualified CryptoVenues.Internal.Log   as Log
+import qualified Data.Vector  as Vec
 {-# ANN module ("HLint: ignore Use camelCase"::String) #-}
 
 
@@ -56,7 +57,7 @@ userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 
 
 
 -- Orderbook
-type ApiOb
+type ApiOb -- Example: https://www.bitstamp.net/api/v2/order_book/btcpax
    = "api"
    :> "v2"
    :> "order_book"
@@ -76,11 +77,14 @@ type BitstampOrder = (QuotedScientific,QuotedScientific)   -- Price, Quantity
 parseOrder :: BitstampOrder -> Json.Parser SomeOrder
 parseOrder (price,qty) = either fail return $ parseSomeOrderSci price qty
 
+nonZeroPrice :: BitstampOrder -> Bool
+nonZeroPrice (price, _) = price /= 0
+
 instance Json.FromJSON (SomeBook "bitstamp") where
    parseJSON val =
       let fromBook Book{..} = mkSomeBook
-            <$> traverse parseOrder bids
-            <*> traverse parseOrder asks
+            <$> traverse parseOrder (Vec.filter nonZeroPrice bids)
+            <*> traverse parseOrder (Vec.filter nonZeroPrice asks)
       in Json.parseJSON val >>= fromBook >>= either fail return
 
 
