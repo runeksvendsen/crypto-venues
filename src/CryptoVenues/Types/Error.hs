@@ -71,18 +71,18 @@ instance Show FetchErr where
             ("Too many requests" % text)
             (maybe "" fromWaitingTime waitingTimeM)
    show (ConnectionErr err) =
-      unlines
+      unwords
          [ "Connection error:"
          , err
          ]
    show (EndpointErr baseUrl status) =
-      unlines
+      unwords
          [ "Endpoint error:"
          , showBaseUrl baseUrl
          , show (Status.statusCode status) <> " (" <> toS (Status.statusMessage status) <> ")"
          ]
    show (InternalErr err) =
-      unlines
+      unwords
          [ "InternalErr error:"
          , toS err
          ]
