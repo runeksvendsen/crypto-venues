@@ -156,10 +156,11 @@ handleStatusCode res url
     statusCode = Status.statusCode status
     failureResponseText :: T.Text
     failureResponseText = toS $
-        format ("Unhandled failure response.\nCode: " % int %
-                "\nMsg: " % text %
-                "\nUrl: " % string %
-                "\nBody: " % text)
+        format ("Unhandled failure response" %
+                ". Code: " % int %
+                ". Msg: " % text %
+                ". Url: " % string %
+                ". Body: " % text)
             statusCode
             (toS $ Status.statusMessage status)
             (show $ SC.showBaseUrl url)
