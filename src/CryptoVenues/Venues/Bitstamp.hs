@@ -13,6 +13,7 @@ import CryptoVenues.Venues.Common.ScientificOrder
 
 import qualified Servant.Client        as SC
 import Servant.API
+import Data.Aeson (FromJSON(parseJSON), (.:), (.:?))
 import qualified Data.Aeson   as Json
 import qualified Data.Aeson.Types   as Json
 import qualified Data.Text as T
@@ -70,7 +71,17 @@ data Book = Book
    , bids :: Vector BitstampOrder
    , asks :: Vector BitstampOrder
    } deriving (Eq, Show, Generic)
-instance Json.FromJSON Book
+
+instance Json.FromJSON Book where
+   parseJSON = Json.withObject "Bistamp orderbook" $ \o -> do
+      mBids <- o .:? "bids"
+      mAsks <- o .:? "asks"
+      timestamp <- o .: "timestamp"
+      pure $ Book
+         { timestamp = timestamp
+         , bids = fromMaybe mempty mBids
+         , asks = fromMaybe mempty mAsks
+         }
 
 type BitstampOrder = (QuotedScientific,QuotedScientific)   -- Price, Quantity
 
