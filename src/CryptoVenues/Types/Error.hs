@@ -27,6 +27,7 @@ import Servant.Client.Core
 import Servant.Client                        as SC
 import qualified Network.HTTP.Types.Status   as Status
 import qualified Data.Text as T
+import qualified Data.Text.Lazy as LT
 import qualified Data.Time.Units             as Time
 import qualified Data.Sequence               as Seq
 import qualified Network.HTTP.Types.Header   as Header
@@ -162,9 +163,10 @@ handleStatusCode res url
                 ". Url: " % string %
                 ". Body: " % text)
             statusCode
-            (toS $ Status.statusMessage status)
+            (newlineToSpace $ toS $ Status.statusMessage status)
             (show $ SC.showBaseUrl url)
-            (toS $ responseBody res)
+            (newlineToSpace $ toS $ responseBody res)
+    newlineToSpace = LT.replace "\n" " " . LT.replace "\r\n" " "
 
 -- Get the number of seconds to wait before retrying from
 --  a "Retry-After" header, if present. Assumed to contain
