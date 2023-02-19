@@ -9,5 +9,5 @@ in pkgs.haskell-nix.project {
     name = "crypto-venues";
     src = ./.;
   };
-  compiler-nix-name = "ghc865"; # Not required for `stack.yaml` based projects.
+  compiler-nix-name = "ghc8107";
 }
