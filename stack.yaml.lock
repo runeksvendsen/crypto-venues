@@ -5,19 +5,16 @@
 
 packages:
 - completed:
-    cabal-file:
-      size: 2348
-      sha256: 3af51f98788b6439fff0f05fb57b5f1cab29d2b3993ca4ea7e9e9a71ef643f9b
     name: orderbook
     version: 0.1.0.0
     git: https://github.com/runeksvendsen/orderbook.git
     pantry-tree:
-      size: 747
-      sha256: d48570e4cfdc2458a1211024d8eba859ddc881e6b23e523a6b63f057274aa4af
-    commit: 1cfe64aeb59ddebcfb0b8353f82457d16766fa36
+      size: 976
+      sha256: 3f1f462fbb923a3a64503431590e410f68631aad491fe95c7ccdd7db629df5d7
+    commit: 6521d80ffbf17a524de70bda040da170643e5e78
   original:
     git: https://github.com/runeksvendsen/orderbook.git
-    commit: 1cfe64aeb59ddebcfb0b8353f82457d16766fa36
+    commit: 6521d80ffbf17a524de70bda040da170643e5e78
 - completed:
     hackage: logging-3.0.5@sha256:88096d3124fce9a19af3720f751e1a354d866ed5030d2e5197238d2277cdb2f2,2374
     pantry-tree:

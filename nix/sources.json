@@ -42,10 +42,10 @@
         "owner": "runeksvendsen",
         "ref": "master",
         "repo": "orderbook",
-        "rev": "1cfe64aeb59ddebcfb0b8353f82457d16766fa36",
-        "sha256": "0nbiabr9v186hbkcgq54nmbp0hfi1cxbvddhqrj25mrsm176v8lf",
+        "rev": "6521d80ffbf17a524de70bda040da170643e5e78",
+        "sha256": "035b3hf7npz1p371rn6wzskvzj7y030k4d78rv943xbd0qd7la06",
         "type": "tarball",
-        "url": "https://github.com/runeksvendsen/orderbook/archive/1cfe64aeb59ddebcfb0b8353f82457d16766fa36.tar.gz",
+        "url": "https://github.com/runeksvendsen/orderbook/archive/6521d80ffbf17a524de70bda040da170643e5e78.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
