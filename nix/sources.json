@@ -24,15 +24,15 @@
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
-        "branch": "release-20.03",
+        "branch": "release-22.05",
         "description": "Nix Packages collection",
         "homepage": "",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "345ff18c99af958afdbd57f077aae9af4000e864",
-        "sha256": "1igwp71cyd8s6j1r80xh895jjfsdry4y67mhr7kmjxc3hbc3axly",
+        "rev": "0874168639713f547c05947c76124f78441ea46c",
+        "sha256": "0gw5l5bj3zcgxhp7ki1jafy6sl5nk4vr43hal94lhi15kg2vfmfy",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/345ff18c99af958afdbd57f077aae9af4000e864.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/0874168639713f547c05947c76124f78441ea46c.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "orderbook": {
@@ -40,8 +40,8 @@
         "description": "Type safe limit order book",
         "homepage": "",
         "owner": "runeksvendsen",
-        "repo": "orderbook",
         "ref": "master",
+        "repo": "orderbook",
         "rev": "1cfe64aeb59ddebcfb0b8353f82457d16766fa36",
         "sha256": "0nbiabr9v186hbkcgq54nmbp0hfi1cxbvddhqrj25mrsm176v8lf",
         "type": "tarball",
