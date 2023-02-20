@@ -34,3 +34,6 @@ jobs:
 
       - name: Run tests
         run: $(nix-build -A crypto-venues.components.tests)/bin/crypto-venues-test
+
+      - name: Build executables
+        run: nix-build -A crypto-venues.components.exes
