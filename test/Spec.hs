@@ -15,6 +15,6 @@ maxRetries = 10
 main = Log.withStderrLogging $ do
    Log.setLogLevel Log.LevelError
    man <- HTTPS.newTlsManager
-   let runHspec = hspecWith defaultConfig { configSmallCheckDepth = scDepth }
+   let runHspec = hspecWith defaultConfig { configSmallCheckDepth = Just scDepth }
    runHspec $ Spec.RetryAfter.spec man
    runHspec $ Spec.VenueFetch.spec man maxRetries
