@@ -37,3 +37,6 @@ jobs:
 
       - name: Build executables
         run: nix-build -A crypto-venues.components.exes
+
+      - name: Test shell
+        run: nix-shell --run "echo success"
