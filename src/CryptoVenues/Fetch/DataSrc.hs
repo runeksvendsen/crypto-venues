@@ -25,5 +25,5 @@ srcFetch man ds modifyErr = do
         resR      -> return resR
     return $ fmapL (fromServant url) resModE
   where
-     env = SC.ClientEnv man url Nothing
+     env = SC.ClientEnv man url Nothing SC.defaultMakeClientRequest
      url = dsUrl ds
