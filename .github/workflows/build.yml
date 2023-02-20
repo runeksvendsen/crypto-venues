@@ -30,7 +30,7 @@ jobs:
         run: nix-build -A crypto-venues.components.library
 
       - name: Build tests
-        run: nix-build -A orderbook.components.tests
+        run: nix-build -A crypto-venues.components.tests
 
       - name: Run tests
-        run: $(nix-build -A orderbook.components.tests)/bin/orderbook-test
+        run: $(nix-build -A crypto-venues.components.tests)/bin/orderbook-test
