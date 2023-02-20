@@ -2,7 +2,7 @@ resolver: lts-14.0
 
 extra-deps:
 - git: https://github.com/runeksvendsen/orderbook.git
-  commit: 6521d80ffbf17a524de70bda040da170643e5e78
+  commit: 27ca137bc184828a1177c513083d874261b95726
 - logging-3.0.5@sha256:88096d3124fce9a19af3720f751e1a354d866ed5030d2e5197238d2277cdb2f2
 - rate-limit-1.4.1@sha256:27abe882e8b7851202cac124ea2b631e77ab7216f7a655b0782704838fe3c305
 - time-units-1.0.0@sha256:27cf54091c4a0ca73d504fc11d5c31ab4041d17404fe3499945e2055697746c1

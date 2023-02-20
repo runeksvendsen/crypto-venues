@@ -8,8 +8,8 @@ packages:
 source-repository-package
     type: git
     location: https://github.com/runeksvendsen/orderbook.git
-    --sha256: Bih6GgZt9UHSzug0MsEA/si/p/7c2BzOuOFfexwcqww=
-    tag: 6521d80ffbf17a524de70bda040da170643e5e78
+    --sha256: ns+ggfl0u82GkWVBol6DCodNnFbyBEmgqexexNy5X8w=
+    tag: 27ca137bc184828a1177c513083d874261b95726
 
 allow-older: *
 allow-newer: *

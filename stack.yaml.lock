@@ -9,12 +9,12 @@ packages:
     version: 0.1.0.0
     git: https://github.com/runeksvendsen/orderbook.git
     pantry-tree:
-      size: 976
-      sha256: 3f1f462fbb923a3a64503431590e410f68631aad491fe95c7ccdd7db629df5d7
-    commit: 6521d80ffbf17a524de70bda040da170643e5e78
+      size: 1360
+      sha256: 73b75cec3e37f14a1ebaeaa79d31056ddab26cf0b3403ff193748cba25c2caaf
+    commit: 27ca137bc184828a1177c513083d874261b95726
   original:
     git: https://github.com/runeksvendsen/orderbook.git
-    commit: 6521d80ffbf17a524de70bda040da170643e5e78
+    commit: 27ca137bc184828a1177c513083d874261b95726
 - completed:
     hackage: logging-3.0.5@sha256:88096d3124fce9a19af3720f751e1a354d866ed5030d2e5197238d2277cdb2f2,2374
     pantry-tree:
