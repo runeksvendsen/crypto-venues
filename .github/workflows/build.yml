@@ -33,4 +33,4 @@ jobs:
         run: nix-build -A crypto-venues.components.tests
 
       - name: Run tests
-        run: $(nix-build -A crypto-venues.components.tests)/bin/orderbook-test
+        run: $(nix-build -A crypto-venues.components.tests)/bin/crypto-venues-test
