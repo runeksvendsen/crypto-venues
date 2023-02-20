@@ -35,7 +35,7 @@ testRequest
     -> QC.Positive Word
     -> IO ()
 testRequest man statusCode (client, baseUrl) (QC.Positive secs) = do
-    resE <- SC.runClientM (client statusCode secs) (SC.ClientEnv man baseUrl Nothing)
+    resE <- SC.runClientM (client statusCode secs) (SC.ClientEnv man baseUrl Nothing SC.defaultMakeClientRequest)
     let fetchErr (Left err) = Error.fromServant baseUrl err
         fetchErr (Right _) = error "Success response"
     fetchErr resE `shouldBe` Error.TooManyRequests (Just $ fromIntegral secs)
@@ -57,7 +57,7 @@ startServer man = do
     waitForServer waitSeconds client baseUrl
         | waitSeconds <= 0.0 = return ()
         | otherwise          = do
-            resE <- SC.runClientM (client 429 0) (SC.ClientEnv man baseUrl Nothing)
+            resE <- SC.runClientM (client 429 0) (SC.ClientEnv man baseUrl Nothing SC.defaultMakeClientRequest)
             case resE of
                 Left (SC.ConnectionError _) -> do
                     let delayMicros = 100000
