@@ -28,6 +28,7 @@ import qualified Data.Aeson as Json
 import qualified Data.Vector as Vec
 import qualified Data.Text as T
 import qualified Data.Map.Strict as Map
+import qualified Data.Set as Set
 import           Unsafe.Coerce (unsafeCoerce)
 import qualified Control.Monad.Catch as Catch
 import Data.List (unlines)
@@ -49,6 +50,7 @@ newtype Response = Response (Vector (Vector ResponseMapping))
 responseMapping :: Response -> Mapping
 responseMapping =
     Mapping . toMap
+            . ignoreTestSymbols
             . ignorePerpetualFutures
             . map getResponseMapping
             . Vec.toList
@@ -64,6 +66,8 @@ responseMapping =
     --  futures contract to be equal to its underlying asset.
     ignorePerpetualFutures = filter (not . isPerpetualFuture . fst)
     isPerpetualFuture symbol = "F0" `T.isSuffixOf` symbol
+    ignoreTestSymbols = filter (not . isTestSymbol . fst)
+    isTestSymbol = ("TEST" `T.isPrefixOf`) -- Bitfinex claims e.g. TESTBTC is the same as BTC, but we disagree
 
 instance Json.FromJSON ResponseMapping
 instance Json.FromJSON Response
@@ -98,26 +102,42 @@ normalize
     -> m (MarketList "bitfinex")  -- ^ Contains official symbols (e.g. "USDT")
 normalize mapping markets =
     if not (null overlappingMarkets)
-        then Catch.throwM $ BitfinexOverlappingMarkets overlappingMarkets mapping
+        then Catch.throwM $ BitfinexOverlappingMarkets relevantInternalMarkets overlappingMarkets (Mapping relevantMapping')
         else pure $ MarketList newMarketList
   where
     newMarketList = map (normalizeMarket mapping) (getMarkets markets)
+
     overlappingMarkets = getOverlappingMarkets newMarketList
+
     getOverlappingMarkets =
         filter ((> 1) . length) . groupOnOrd (\mkt -> (miBase mkt, miQuote mkt))
+
+    relevantMapping' =
+        let relevantNormalizedSymbols = concatMap (\m -> [miBase m, miQuote m]) $ concat overlappingMarkets
+            (Mapping mapping') = mapping
+        in Map.filter (`elem` relevantNormalizedSymbols) mapping'
+
+    relevantInternalMarkets =
+        filter
+            (\m -> not $ Set.fromList [miBase m, miQuote m] `Set.disjoint` Map.keysSet relevantMapping')
+            (getMarkets markets)
 
 -- | Exception thrown in case the process of renaming internal Bitfinex
 --    symbols into official symbols results in two different markets
 --    with the same "base" and "quote" symbol.
 --   This is considered a bug in the Bitfinex API and is thefore fatal.
-data BitfinexOverlappingMarkets = BitfinexOverlappingMarkets [[Market "bitfinex"]] Mapping
+data BitfinexOverlappingMarkets = BitfinexOverlappingMarkets
+    [Market "bitfinex_internal"] -- ^ Relevant subset of input markets
+    [[Market "bitfinex"]] -- ^ Overlapping markets using official symbols
+    Mapping -- ^ Part of mapping that produced overlapping markets
 
 instance Show BitfinexOverlappingMarkets where
-   show (BitfinexOverlappingMarkets overlappingMarkets mapping) =
+   show (BitfinexOverlappingMarkets markets overlappingMarkets mapping) =
       let githubUrl =
               "https://github.com/runeksvendsen/crypto-venues/issues/new?title=Bug:+overlapping+Bitfinex+markets"
           details = unlines
-              [ "Markets: " <> show overlappingMarkets
+              [ "Overlapping markets: " <> show overlappingMarkets
+              , "Input markets: " <> show markets
               , "Mapping: " <> show mapping
               ]
       in unlines
