@@ -16,6 +16,10 @@ This library enables:
 
 The fetched order books are compatible with the [`orderbook`](https://github.com/runeksvendsen/orderbook) library, which we can then use to query the liquidity of the given market.
 
+## CLI
+
+The functionality of this library is exposed as the CLI application [rest-depth](https://github.com/runeksvendsen/rest-depth).
+
 ## Development
 
 To add support for a new exchange, implement the [`EnumMarkets`](https://github.com/runeksvendsen/crypto-venues/blob/dc093651d15a19d6d8185454bcf08c1284ab8bfa/src/Fetch/EnumMarkets.hs#L16) class (which retrieves a list of supported markets) for the given exchange, as well as the [`MarketBook`](https://github.com/runeksvendsen/crypto-venues/blob/dc093651d15a19d6d8185454bcf08c1284ab8bfa/src/Fetch/MarketBook.hs#L29) class which:
