@@ -26,3 +26,7 @@ To add support for a new exchange, implement the [`EnumMarkets`](https://github.
 
 1. Retrieves an orderbook when given a `Market` returned by the `EnumMarkets` implementation
 2. Returns the rate limit for fetching orderbooks from the given exchange
+
+### Testing
+
+Note that Binance restricts the IP addresses that can access its services, so that US IP addresses are denied access. Because the VMs for the GitHub CI are located in the US, the tests for Binance are disabled for the GitHub CI.
