@@ -7,7 +7,7 @@ cabal-version: 1.12
 -- hash: 2d7c81b85d888c6818086a43acb457d95b9d9ee5ee47844d52ccec8359447edf
 
 name:           crypto-venues
-version:        0.3.0.0
+version:        1.0.0.0
 synopsis:       Fetch order books from cryptocurrency exchanges
 description:    Please see the README on Github at <https://github.com/runeksvendsen/crypto-venues#readme>
 homepage:       https://github.com/runeksvendsen/crypto-venues#readme
