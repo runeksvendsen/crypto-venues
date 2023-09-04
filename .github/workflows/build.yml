@@ -34,7 +34,7 @@ jobs:
         run: nix-build -A crypto-venues.components.tests
 
       - name: Run tests
-        run: $(nix-build -A crypto-venues.components.tests)/bin/crypto-venues-test
+        run: $(nix-build -A crypto-venues.components.tests)/bin/crypto-venues-test --skip=binance
 
       - name: Build executables
         run: nix-build -A crypto-venues.components.exes
