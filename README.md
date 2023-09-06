@@ -1,6 +1,6 @@
 # Cryptocurrency venues
 
-[<img src="https://github.com/runeksvendsen/crypto-venues/actions/workflows/build.yml/badge.svg">]([https://travis-ci.com/runeksvendsen/crypto-venues](https://github.com/runeksvendsen/crypto-venues/actions/workflows/build.yml))
+[<img src="https://github.com/runeksvendsen/crypto-venues/actions/workflows/build.yml/badge.svg">](https://github.com/runeksvendsen/crypto-venues/actions/workflows/build.yml)
 
 
 ### Fetch order book data from various cryptocurrency exchanges.
