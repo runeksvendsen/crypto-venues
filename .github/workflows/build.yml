@@ -21,6 +21,8 @@ jobs:
             system-features = benchmark big-parallel kvm nixos-test
 
       - uses: DeterminateSystems/magic-nix-cache-action@main
+        with:
+          upstream-cache: https://cache.nixos.org https://cache.iog.io
 
       - name: Build library
         run: nix-build -A crypto-venues.components.library
