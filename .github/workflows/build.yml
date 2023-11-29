@@ -31,6 +31,7 @@ jobs:
       - name: Build tests
         run: nix-build -A crypto-venues.components.tests
 
+      # NOTE: Binance is skipped because it doesn't allow US IP addresses
       - name: Run tests
         run: $(nix-build -A crypto-venues.components.tests)/bin/crypto-venues-test --skip=binance
 
