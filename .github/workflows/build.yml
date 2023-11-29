@@ -20,10 +20,9 @@ jobs:
             trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ= crypto-venues.cachix.org-1:f/Gct4zIWxxQkdM1t5J+gjwTF/TwP3f+22dXYndeX44=
             system-features = benchmark big-parallel kvm nixos-test
 
-      - uses: cachix/cachix-action@v12
+      - uses: DeterminateSystems/magic-nix-cache-action@main
         with:
-          name: crypto-venues
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          upstream-cache: https://cache.nixos.org https://cache.iog.io
 
       - name: Build library
         run: nix-build -A crypto-venues.components.library
