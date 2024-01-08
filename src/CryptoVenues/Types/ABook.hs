@@ -14,11 +14,6 @@ import qualified OrderBook.Types                as OB
 
 import qualified Data.Aeson                     as Json
 import           Data.Aeson                     ((.=), (.:))
-import           Data.Proxy                     (Proxy(..))
-import           GHC.TypeLits                   (KnownSymbol, SomeSymbol(..)
-                                                , symbolVal, someSymbolVal
-                                                )
-import           Data.Maybe                     (fromMaybe)
 
 -- | Just some order book
 data ABook =
@@ -102,7 +97,6 @@ data MarketBookVenue =
 
 marketBookVenue :: String -> Maybe MarketBookVenue
 marketBookVenue "bitfinex" = Just . MarketBookVenue $ Proxy @"bitfinex"
-marketBookVenue "bittrex"  = Just . MarketBookVenue $ Proxy @"bittrex"
 marketBookVenue "binance"  = Just . MarketBookVenue $ Proxy @"binance"
 marketBookVenue "bitstamp" = Just . MarketBookVenue $ Proxy @"bitstamp"
 marketBookVenue "coinbase" = Just . MarketBookVenue $ Proxy @"coinbase"

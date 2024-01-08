@@ -49,7 +49,6 @@ library
       CryptoVenues.Venues.Bitfinex
       CryptoVenues.Venues.Bitfinex.Mapping
       CryptoVenues.Venues.Bitstamp
-      CryptoVenues.Venues.Bittrex
       CryptoVenues.Venues.Coinbase
       CryptoVenues.Venues.Common.ScientificOrder
   other-modules:

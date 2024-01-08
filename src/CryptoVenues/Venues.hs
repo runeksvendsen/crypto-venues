@@ -13,7 +13,6 @@ import CryptoVenues.Fetch.MarketBook
 import CryptoVenues.Venues.Coinbase     as Coinbase       ()
 import CryptoVenues.Venues.Bitstamp     as Bitstamp       ()
 import qualified CryptoVenues.Venues.Bitfinex     as Bitfinex
-import CryptoVenues.Venues.Bittrex      as Bittrex        ()
 import CryptoVenues.Venues.Binance      as Binance        ()
 
 import qualified Data.HashMap.Strict   as HM
@@ -28,7 +27,6 @@ instance MarketBook "bitfinex" where
 allVenues :: [AnyVenue]
 allVenues =
    [ AnyVenue (Proxy :: Proxy "bitfinex")
-   , AnyVenue (Proxy :: Proxy "bittrex")
    , AnyVenue (Proxy :: Proxy "binance")
    , AnyVenue (Proxy :: Proxy "bitstamp")
    , AnyVenue (Proxy :: Proxy "coinbase")
@@ -47,4 +45,3 @@ venueLookup :: Text -> Maybe AnyVenue
 venueLookup = (`HM.lookup` venueMap)
 
 
-   
