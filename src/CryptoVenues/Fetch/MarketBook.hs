@@ -139,6 +139,10 @@ data AnyVenue
      MarketBook venue
    => AnyVenue (Proxy venue)
 
+instance Eq AnyVenue where
+   AnyVenue p1 == AnyVenue p2 =
+      symbolVal p1 == symbolVal p2
+
 instance Show AnyVenue where
    show (AnyVenue p) = symbolVal p
 
